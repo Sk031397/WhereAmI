@@ -27,7 +27,8 @@ export class Renderer {
     );
 
     this._updaters = new Set();
-    this._clock = new THREE.Clock();
+    this._lastTime = performance.now() / 1000;
+    this._startTime = this._lastTime;
     this.activeScene = null;
 
     window.addEventListener('resize', () => this._onResize());
@@ -52,8 +53,11 @@ export class Renderer {
   }
 
   _frame() {
-    const delta = this._clock.getDelta();
-    const elapsed = this._clock.getElapsedTime();
+    const now = performance.now() / 1000;
+    // Clamp delta so a backgrounded tab doesn't jump the camera on return.
+    const delta = Math.min(now - this._lastTime, 0.1);
+    const elapsed = now - this._startTime;
+    this._lastTime = now;
     for (const fn of this._updaters) fn(delta, elapsed);
     if (this.activeScene) {
       this.renderer.render(this.activeScene, this.camera);

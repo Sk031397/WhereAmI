@@ -84,19 +84,19 @@ export function buildStadium(theme) {
   group.add(north);
 
   // South stand (near side) — has the entrance gap
-  const south = makeStand({ width: halfLen * 2 + 4, mat, gap: true });
+  const south = makeStand({ width: halfLen * 2 + 4, mat: standMat, gap: true });
   south.position.set(0, tierHeight / 2 - 1, halfWid + standOut);
   south.rotation.y = Math.PI;
   group.add(south);
 
   // East stand
-  const east = makeStand({ width: halfWid * 2 + 4, mat });
+  const east = makeStand({ width: halfWid * 2 + 4, mat: standMat });
   east.position.set(halfLen + standOut, tierHeight / 2 - 1, 0);
   east.rotation.y = -Math.PI / 2;
   group.add(east);
 
   // West stand
-  const west = makeStand({ width: halfWid * 2 + 4, mat });
+  const west = makeStand({ width: halfWid * 2 + 4, mat: standMat });
   west.position.set(-(halfLen + standOut), tierHeight / 2 - 1, 0);
   west.rotation.y = Math.PI / 2;
   group.add(west);
