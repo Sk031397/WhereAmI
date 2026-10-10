@@ -8,6 +8,7 @@ import { LogOverlay } from './ui/log.js';
 import { MapOverlay } from './ui/map.js';
 import { JourneyController } from './journey/journeyController.js';
 import { createStamfordBridge } from './scenes/stamfordBridge.js';
+import { createEmirates } from './scenes/emirates.js';
 import { STADIUMS } from './data/stadiums.js';
 
 /**
@@ -31,9 +32,7 @@ function boot() {
 
   const scenes = new SceneManager(renderer);
   scenes.register('stamford-bridge', createStamfordBridge);
-  // Slice 3: the Emirates scene doesn't exist yet, so the Bus journey lands
-  // back at Stamford Bridge. Slice 4 replaces this with the real red ground.
-  scenes.register('emirates', createStamfordBridge);
+  scenes.register('emirates', createEmirates);
 
   const controls = new FirstPersonControls(renderer.camera, renderer.domElement);
   const tutorial = new Tutorial(overlayRoot);
