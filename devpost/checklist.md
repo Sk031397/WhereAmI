@@ -19,7 +19,7 @@ Build mode: fast
   Learner check: Open the app, click to capture the mouse, walk up to and into the stadium, and say whether the look, feel, and controls match what you pictured.
   Commit: `Scaffold Matchday Hop: Stamford Bridge scene with first-person controls and tutorial`
 
-- [ ] **2. Walk into zones and collect rivalry cards, reviewable in the log (J)**
+- [x] **2. Walk into zones and collect rivalry cards, reviewable in the log (J)**
   Becomes usable: Walking into 2-3 geofence zones (outside and inside Stamford Bridge) pops a non-blocking rivalry card that auto-dismisses after ~5-10s; each card saves to your log; pressing J opens the collected-cards log (with an empty state), and it persists across restarts.
   Why now: Completes the single-stadium loop and exercises the data model + localStorage persistence early, where mistakes are cheap to fix.
   PRD ref: `prd.md > Geofence info-zones and cards`, `prd.md > The collected-cards log (J)`, `prd.md > States and Boundaries`
@@ -71,3 +71,5 @@ Reflection: [offered/answered/declined/already covered — personal answer belon
 Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
 
 ## Revisions
+
+- Decoupled WASD movement from pointer lock — the build discovered that gating movement behind `locked === true` created a dead-input trap: whenever pointer lock dropped (Esc, clicking a map pin/button, tab-out) WASD silently stopped with no recovery. Movement now runs whenever controls are enabled and no blocking overlay is open; pointer lock governs only mouse-look. `inputBlocked` is recomputed each frame so it stays in sync however an overlay opens/closes.

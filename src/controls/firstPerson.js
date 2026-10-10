@@ -16,6 +16,7 @@ export class FirstPersonControls {
     this.controls = new PointerLockControls(camera, domElement);
     this.speed = 14; // units per second
     this.enabled = true;
+    this.inputBlocked = false; // true while a blocking overlay is open
     this.locked = false;
     this.onLockChange = null;
 
@@ -59,7 +60,11 @@ export class FirstPersonControls {
   }
 
   update(delta) {
-    if (!this.enabled || !this.locked) return;
+    // Movement works whenever controls are enabled — it does NOT require
+    // pointer lock. Only mouse-look needs lock. This avoids the dead-input
+    // trap where losing lock (Esc, clicking a button) silently kills WASD.
+    if (!this.enabled) return;
+    if (this.inputBlocked) return;
 
     const f = (this._keys.has('KeyW') || this._keys.has('ArrowUp')) ? 1 : 0;
     const b = (this._keys.has('KeyS') || this._keys.has('ArrowDown')) ? 1 : 0;

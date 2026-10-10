@@ -80,6 +80,9 @@ function boot() {
 
   // --- Per-frame updates ------------------------------------------------
   renderer.addUpdater((delta, elapsed) => {
+    // Pause walking whenever a blocking overlay is open (always in sync,
+    // however the overlay was opened or closed).
+    controls.inputBlocked = log.open || map.open;
     controls.update(delta);
     zoneSystem.update();
     scenes.current?.update?.(delta, elapsed);
