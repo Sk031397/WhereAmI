@@ -14,6 +14,7 @@ export class SceneManager {
     this._factories = new Map();
     this._cache = new Map();
     this.current = null;
+    this.onActivate = null;
   }
 
   /** Register a stadium by id with a factory that builds its scene bundle. */
@@ -36,6 +37,7 @@ export class SceneManager {
     this.current = bundle;
     this.renderer.setActiveScene(bundle.scene);
     this.placeAtSpawn();
+    this.onActivate?.(bundle);
     return bundle;
   }
 

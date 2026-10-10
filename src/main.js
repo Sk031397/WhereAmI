@@ -2,14 +2,17 @@ import { Renderer, isWebGLAvailable } from './core/renderer.js';
 import { SceneManager } from './core/sceneManager.js';
 import { FirstPersonControls } from './controls/firstPerson.js';
 import { Tutorial } from './controls/tutorial.js';
+import { ZoneSystem } from './zones/zoneSystem.js';
+import { CardOverlay } from './ui/card.js';
+import { LogOverlay } from './ui/log.js';
 import { createStamfordBridge } from './scenes/stamfordBridge.js';
+import { STADIUMS } from './data/stadiums.js';
 
 /**
  * Matchday Hop — entry point.
- * Boots the renderer, registers the stadiums, places the player outside
- * Stamford Bridge, and starts the first-person loop with the contextual
- * tutorial. Later slices add zones/cards (2), the map + journey (3), and
- * the Emirates (4).
+ * Slice 1: renderer + first-person controls + tutorial at Stamford Bridge.
+ * Slice 2: geofence zones -> non-blocking rivalry cards -> J log (persisted).
+ * Later slices add the map + journey (3) and the Emirates (4).
  */
 function boot() {
   const appEl = document.getElementById('app');
@@ -17,7 +20,6 @@ function boot() {
   const lockPrompt = document.getElementById('lock-prompt');
   const fatal = document.getElementById('fatal');
 
-  // Fail gracefully with a readable message instead of a blank canvas.
   if (!isWebGLAvailable()) {
     fatal.classList.add('show');
     return;
@@ -31,7 +33,6 @@ function boot() {
   const controls = new FirstPersonControls(renderer.camera, renderer.domElement);
   const tutorial = new Tutorial(overlayRoot);
 
-  // Pointer-lock prompt: show "Click to look around" whenever not locked.
   controls.onLockChange = (locked) => {
     lockPrompt.classList.toggle('hidden', locked);
     if (locked) tutorial.begin();
@@ -39,16 +40,50 @@ function boot() {
   controls.onFirstLook = () => tutorial.onLook();
   controls.onFirstMove = () => tutorial.onMove();
 
-  // Drive controls each frame.
-  renderer.addUpdater((delta) => controls.update(delta));
+  // --- Zones + cards ----------------------------------------------------
+  const zoneSystem = new ZoneSystem(renderer.camera);
+  const card = new CardOverlay(overlayRoot);
 
-  // Start at Stamford Bridge, outside the entrance.
+  // Flat id -> card lookup across all grounds, for the log.
+  const allCards = Object.assign(
+    {},
+    ...Object.values(STADIUMS).map((s) => s.cards)
+  );
+  const log = new LogOverlay(overlayRoot, allCards);
+
+  // On zone entry, pop that zone's card (which also records it to the log).
+  zoneSystem.onEnter = (zone) => {
+    const current = scenes.current;
+    const cardData = current?.cards?.[zone.cardId];
+    if (cardData) card.show(zone.label, cardData);
+  };
+
+  // When a scene becomes active, point the zone system + card accent at it.
+  scenes.onActivate = (bundle) => {
+    zoneSystem.setZones(bundle.zones ?? []);
+    if (bundle.accent) card.setAccent(bundle.accent);
+  };
+
+  // --- Per-frame updates ------------------------------------------------
+  renderer.addUpdater((delta, elapsed) => {
+    controls.update(delta);
+    zoneSystem.update();
+    scenes.current?.update?.(delta, elapsed);
+  });
+
+  // --- Keybinds ---------------------------------------------------------
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'KeyJ') {
+      log.toggle();
+    } else if (e.code === 'Escape' && log.open) {
+      log.hide();
+    }
+  });
+
   scenes.activate('stamford-bridge');
-
   renderer.start();
 
-  // Expose a tiny handle for debugging in the console.
-  window.__matchday = { renderer, scenes, controls };
+  window.__matchday = { renderer, scenes, controls, zoneSystem, log };
 }
 
 boot();
