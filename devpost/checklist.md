@@ -29,7 +29,7 @@ Build mode: fast
   Learner check: Collect a couple of cards, open the log with J, restart the app, and confirm your collected cards are still there.
   Commit: `Add geofence zones, rivalry cards, and persistent collected-cards log`
 
-- [ ] **3. Open the map (M), pick Bus, and watch the cinematic journey — the kernel**
+- [x] **3. Open the map (M), pick Bus, and watch the cinematic journey — the kernel**
   Becomes usable: Pressing M opens the London atlas/compass map with a labeled pin per ground and "You are here"; clicking the destination pin reveals the Bus travel mode; selecting Bus plays a skippable ~30s cinematic camera flythrough over low-poly "London" with a matchday soundscape, then returns you to a stadium exterior.
   Why now: This is the whole point of the app. Proving the cinematic journey feels right early means everything else is just setting — and if the camera path or pacing is wrong, we find out now, not last.
   PRD ref: `prd.md > The map and travel selection (M)`, `prd.md > The journey simulation (the kernel)`, `scope.md > The Unique Kernel`
@@ -39,7 +39,7 @@ Build mode: fast
   Learner check: Open the map with M, pick Bus, and watch the journey — tell me whether the kernel ("the cool beat") feels the way you imagined, and what you'd change about the camera, pacing, or sound.
   Commit: `Add map overlay and cinematic Bus journey simulation (kernel)`
 
-- [ ] **4. Arrive at a stylized Emirates and hop both directions**
+- [x] **4. Arrive at a stylized Emirates and hop both directions**
   Becomes usable: The Bus journey now deposits you outside a lit, red stylized Emirates with its own interior, zones, and rivalry cards; you can explore it, open the map, and hop back to Stamford Bridge — the full Core Journey loop works both directions.
   Why now: It reuses everything proven in slices 1-3; the second ground is the payoff, not the risk, so it lands last.
   PRD ref: `prd.md > The Core Journey` (steps 8-9), `prd.md > What We're Building` (two grounds, hop both directions)
