@@ -5,6 +5,8 @@ import { Tutorial } from './controls/tutorial.js';
 import { ZoneSystem } from './zones/zoneSystem.js';
 import { CardOverlay } from './ui/card.js';
 import { LogOverlay } from './ui/log.js';
+import { MapOverlay } from './ui/map.js';
+import { JourneyController } from './journey/journeyController.js';
 import { createStamfordBridge } from './scenes/stamfordBridge.js';
 import { STADIUMS } from './data/stadiums.js';
 
@@ -29,6 +31,9 @@ function boot() {
 
   const scenes = new SceneManager(renderer);
   scenes.register('stamford-bridge', createStamfordBridge);
+  // Slice 3: the Emirates scene doesn't exist yet, so the Bus journey lands
+  // back at Stamford Bridge. Slice 4 replaces this with the real red ground.
+  scenes.register('emirates', createStamfordBridge);
 
   const controls = new FirstPersonControls(renderer.camera, renderer.domElement);
   const tutorial = new Tutorial(overlayRoot);
@@ -64,6 +69,15 @@ function boot() {
     if (bundle.accent) card.setAccent(bundle.accent);
   };
 
+  // --- Map + journey (the kernel) --------------------------------------
+  const journey = new JourneyController(renderer, scenes, controls, overlayRoot);
+  const map = new MapOverlay(overlayRoot, {
+    getCurrentId: () => scenes.current?.id,
+    onTravel: (destId, mode) => {
+      if (mode === 'bus') journey.start(destId);
+    },
+  });
+
   // --- Per-frame updates ------------------------------------------------
   renderer.addUpdater((delta, elapsed) => {
     controls.update(delta);
@@ -73,17 +87,23 @@ function boot() {
 
   // --- Keybinds ---------------------------------------------------------
   window.addEventListener('keydown', (e) => {
+    if (journey.playing) return; // overlays locked out during the journey
     if (e.code === 'KeyJ') {
+      if (map.open) return;
       log.toggle();
-    } else if (e.code === 'Escape' && log.open) {
-      log.hide();
+    } else if (e.code === 'KeyM') {
+      if (log.open) return;
+      map.toggle();
+    } else if (e.code === 'Escape') {
+      if (log.open) log.hide();
+      if (map.open) map.hide();
     }
   });
 
   scenes.activate('stamford-bridge');
   renderer.start();
 
-  window.__matchday = { renderer, scenes, controls, zoneSystem, log };
+  window.__matchday = { renderer, scenes, controls, zoneSystem, log, map, journey };
 }
 
 boot();
