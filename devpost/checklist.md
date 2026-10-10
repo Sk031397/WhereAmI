@@ -9,7 +9,7 @@ Build mode: fast
 
 ## Slices
 
-- [ ] **1. You stand outside a stylized Stamford Bridge and walk around it (first-person)**
+- [x] **1. You stand outside a stylized Stamford Bridge and walk around it (first-person)**
   Becomes usable: A running app that opens on a lit, blue stylized Stamford Bridge exterior; you click to capture the mouse, move with WASD, pan with the mouse, and a contextual tutorial reveals controls as you first use them.
   Why now: Bootstrapping has to live somewhere, and this one slice proves the whole rendering/controls spine (Vite + Three.js, render loop, PointerLock look, movement, tutorial) with something you can actually walk around in.
   PRD ref: `prd.md > The Core Journey` (steps 1-3), `prd.md > Exploring a stadium (outside and in)`
@@ -51,7 +51,7 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after Slice 1 (look/feel + controls feedback shapes the rest of the build)
+- [x] Early usable behavior explored — after Slice 1 (look/feel + controls feedback shapes the rest of the build)
 - [ ] Final kick-the-tires exploration and feedback completed — after Slice 4 (full Core Journey loop)
 
 ## Final Review
