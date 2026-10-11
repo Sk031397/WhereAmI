@@ -9,7 +9,7 @@ Build mode: fast
 
 ## Slices
 
-- [ ] **1. The app runs and drops you into a real 3D place you can fly around**
+- [x] **1. The app runs and drops you into a real 3D place you can fly around**
   Becomes usable: `npm run dev` opens a React app whose screen is filled by Google's Photorealistic 3D Tiles, dropped into the first hand-picked location, and you can look/fly around it. This is the kernel, built first.
   Why now: The flyable real-world 3D *is* the game (`scope.md > The Unique Kernel`) and it's the riskiest piece — an experimental Google API. Proving it loads and flies on slice one means every later slice lands on solid ground, and if the API surface differs from the spec we find out immediately.
   PRD ref: `prd.md > The Core Journey` (steps 1-2), `prd.md > Features and Behavior > Fly and explore the 3D scene`
@@ -51,7 +51,7 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 1 (the kernel: flyable real 3D), where feedback can still shape the rest of the build
+- [x] Early usable behavior explored — after slice 1. Learner has no Google Maps API key yet, so live 3D-tile rendering is deferred to the final review; build verified via compile + clean dev-server boot, and the no-key fallback card confirmed. No look/camera change requested.
 - [ ] Final kick-the-tires exploration and feedback completed — after slice 4, the full loop
 
 ## Final Review

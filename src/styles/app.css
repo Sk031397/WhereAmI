@@ -79,3 +79,27 @@ body {
   color: var(--accent);
   font-size: 0.9em;
 }
+
+/* Floating corner guess map — shadowed panel separated from the 3D canvas. */
+.guessmap {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  width: 320px;
+  height: 220px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--panel-shadow);
+  border: 1px solid rgba(232, 200, 154, 0.18);
+  z-index: 500;
+}
+
+.guessmap__map {
+  height: 100%;
+  width: 100%;
+}
+
+/* Tint the revealed true-location marker so it reads apart from the guess pin. */
+.guessmap__true-marker {
+  filter: hue-rotate(130deg) saturate(1.4);
+}
