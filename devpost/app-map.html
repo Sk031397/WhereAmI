@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Where Am I? — App Map</title>
+<style>
+  :root {
+    --espresso: #1a1512;
+    --charcoal: #262220;
+    --panel: #2e2824;
+    --offwhite: #f4efe9;
+    --muted: #b9ae9f;
+    --accent: #e8c89a;
+    --shadow: 0 12px 36px rgba(0,0,0,0.5);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--espresso);
+    color: var(--offwhite);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  main { max-width: 820px; margin: 0 auto; }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    font-size: 2.1rem;
+    margin: 0 0 0.3rem;
+  }
+  .sub { color: var(--muted); margin-top: 0; }
+  h2 {
+    font-family: Georgia, serif;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    margin-top: 2.4rem;
+    border-bottom: 1px solid rgba(232,200,154,0.2);
+    padding-bottom: 0.4rem;
+  }
+  code {
+    background: var(--charcoal);
+    color: var(--accent);
+    padding: 0.1rem 0.4rem;
+    border-radius: 5px;
+    font-size: 0.9em;
+  }
+  .panel {
+    background: var(--charcoal);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 1.2rem 1.5rem;
+    margin: 1rem 0;
+    border: 1px solid rgba(232,200,154,0.14);
+  }
+  ol, ul { padding-left: 1.3rem; }
+  li { margin: 0.5rem 0; }
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.6rem;
+    margin: 1.2rem 0;
+  }
+  .node {
+    flex: 1 1 150px;
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(232,200,154,0.14);
+    min-width: 150px;
+  }
+  .node .k { color: var(--accent); font-weight: bold; display: block; margin-bottom: 0.2rem; }
+  .node .p { color: var(--muted); font-size: 0.82rem; }
+  .arrow { align-self: center; color: var(--accent); font-size: 1.4rem; }
+  details { margin: 0.6rem 0; }
+  summary { cursor: pointer; color: var(--accent); }
+  .reuse { border-left: 3px solid var(--accent); padding-left: 1rem; }
+  footer { margin-top: 3rem; color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Where Am I?</h1>
+  <p class="sub">A photorealistic 3D "guess the location" game — app map &amp; take-home guide.</p>
+
+  <h2>What it is</h2>
+  <div class="panel">
+    <p>You drop into a real, flyable 3D place (Google Photorealistic 3D Tiles), look
+    around for clues, and click a small corner world map (Leaflet) to drop one locking
+    guess. The game shows how far off you were in kilometers, reveals the true spot,
+    lingers ~5 seconds, then moves to the next place — looping forever. Nothing is
+    saved; a refresh starts over.</p>
+    <p>Three main pieces: a <strong>3D world view</strong>, a <strong>corner guess map</strong>,
+    and a small <strong>pure game-state core</strong> that scores and advances rounds.</p>
+  </div>
+
+  <h2>One action, end to end</h2>
+  <p>What happens when you drop a pin:</p>
+  <div class="flow">
+    <div class="node"><span class="k">You click the map</span><span class="p">GuessMap.jsx — captures the click, reports lat/lng</span></div>
+    <div class="arrow">&rarr;</div>
+    <div class="node"><span class="k">Score it</span><span class="p">App.jsx calls placeGuess() in gameState.js, which uses haversineKm()</span></div>
+    <div class="arrow">&rarr;</div>
+    <div class="node"><span class="k">You see the result</span><span class="p">Scoreboard.jsx shows the distance; the true marker appears on the map</span></div>
+    <div class="arrow">&rarr;</div>
+    <div class="node"><span class="k">Next place</span><span class="p">~5s timer in App.jsx calls advance() — wraps to the first after the last</span></div>
+  </div>
+
+  <h2>Where things live (route)</h2>
+  <div class="panel">
+    <ol>
+      <li><code>src/lib/gameState.js</code> — the pure heart of the game.
+        <code>placeGuess()</code>, <code>advance()</code>, <code>isLocked()</code>. No React, no DOM — this is what the tests exercise.</li>
+      <li><code>src/lib/distance.js</code> — <code>haversineKm()</code>, the great-circle distance used for scoring.</li>
+      <li><code>src/App.jsx</code> — holds the state, wires the three components together, and runs the ~5s reveal timer.</li>
+      <li><code>src/components/</code> — <code>World3D.jsx</code> (Google tiles), <code>GuessMap.jsx</code> (Leaflet), <code>Scoreboard.jsx</code> (the overlay).</li>
+      <li><code>src/data/locations.js</code> — the hand-picked list: camera start + true coordinates per place.</li>
+    </ol>
+  </div>
+
+  <h2>To change this, start here</h2>
+  <div class="panel">
+    <ul>
+      <li><strong>Add or swap locations</strong> &rarr; <code>src/data/locations.js</code>. Tune each <code>camera</code> so the landmark frames well; set <code>answer</code> to the true lat/lng.</li>
+      <li><strong>Change the reveal duration</strong> &rarr; <code>REVEAL_LINGER_MS</code> at the top of <code>src/App.jsx</code>.</li>
+      <li><strong>Restyle the frame</strong> (colors, type, panels) &rarr; <code>src/styles/app.css</code> (the <code>:root</code> palette variables).</li>
+      <li><strong>Change scoring units/format</strong> &rarr; <code>src/components/Scoreboard.jsx</code>.</li>
+      <li><strong>Enable the 3D world</strong> &rarr; put a Google Maps key in <code>.env</code> as <code>VITE_GOOGLE_MAPS_API_KEY</code> (Map Tiles API enabled).</li>
+    </ul>
+  </div>
+
+  <h2>A practice to reuse</h2>
+  <div class="panel reuse">
+    <p><strong>Push testable logic to the edge, away from what you can't test.</strong></p>
+    <p>The 3D tiles layer depends on a live Google key and real rendering, so it can't be
+    meaningfully unit-tested. Instead of giving up on coverage, all the game rules were
+    pulled into a pure module (<code>src/lib/gameState.js</code>) with no DOM or network.
+    That's why <code>tests/gameState.test.js</code> can assert "wraps back to the first
+    location after the last" — your PRD's loop decision as an executable check that runs
+    in milliseconds — while the inherently-visual 3D view is honestly left to a manual
+    smoke test.</p>
+    <p>Next time you build with an agent against an external service, decide early what
+    is deterministic (and test it hard) versus what is genuinely external (and verify it
+    by hand). It's what makes agent-written code trustworthy end to end.</p>
+  </div>
+
+  <h2>Run it again</h2>
+  <div class="panel">
+    <ol>
+      <li><code>npm.cmd install</code> (first time)</li>
+      <li>Put a Google Maps key in <code>.env</code> to see the 3D world</li>
+      <li><code>npm.cmd run dev</code> &rarr; open <code>http://localhost:5173</code></li>
+      <li><code>npm.cmd test</code> &rarr; runs the 12 unit/logic tests</li>
+    </ol>
+  </div>
+
+  <details>
+    <summary>Note on this map</summary>
+    <p>Snapshot generated from source at commit <code>235287e</code> (plus the final-review
+    pass). The code can drift from this description over time; treat it as a starting
+    guide, not a live spec.</p>
+  </details>
+
+  <footer>Where Am I? — built through the Devpost Learn skill workflow (scope &rarr; prd &rarr; spec &rarr; build).</footer>
+</main>
+</body>
+</html>

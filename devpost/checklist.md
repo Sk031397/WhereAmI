@@ -19,7 +19,7 @@ Build mode: fast
   Learner check: Open the app, fly around the first place, and say whether that "dropped into a real place" feeling lands the way you pictured.
   Commit: `Scaffold app and render flyable Photorealistic 3D Tiles`
 
-- [ ] **2. A corner map is always on screen and you can drop a pin on it**
+- [x] **2. A corner map is always on screen and you can drop a pin on it**
   Becomes usable: A small Leaflet map floats in the corner over the 3D view; clicking it drops a single marker and locks it (one guess, no re-click).
   Why now: The guess surface is the second half of the core loop. Adding it now — before scoring — lets us confirm the always-visible corner panel and the instant-lock interaction feel right before wiring numbers to it.
   PRD ref: `prd.md > The Core Journey` (step 3), `prd.md > Features and Behavior > Drop a pin to guess`, `prd.md > Screens and Layout`
@@ -29,7 +29,7 @@ Build mode: fast
   Learner check: Click the corner map to drop your pin, try clicking again, and confirm it locks on the first drop the way you wanted.
   Commit: `Add always-on Leaflet guess map with instant pin lock`
 
-- [ ] **3. You get a distance score and the true location is revealed**
+- [x] **3. You get a distance score and the true location is revealed**
   Becomes usable: After you lock a pin, a bold scoreboard shows how far off you were (km) and the true location appears on the corner map next to your pin.
   Why now: This closes the recognition payoff — the "how close was I" moment (`scope.md > What "Working" Looks Like`). It depends on the pin (slice 2) and the location data (slice 1) already existing.
   PRD ref: `prd.md > The Core Journey` (step 4), `prd.md > Features and Behavior > See how close you were`
@@ -39,7 +39,7 @@ Build mode: fast
   Learner check: Drop a pin somewhere you know is wrong, and confirm the distance number and the revealed true location make sense and feel punchy.
   Commit: `Add Haversine scoring and true-location reveal`
 
-- [ ] **4. It lingers on the result, then auto-advances and loops**
+- [x] **4. It lingers on the result, then auto-advances and loops**
   Becomes usable: After the reveal, the result holds ~5 seconds (3D still flyable), then the game advances to the next location on its own, looping back to the first after the last.
   Why now: This turns three static behaviors into the continuous "one more place" loop (`prd.md > The Core Journey` step 5). It's last because it orchestrates the slices beneath it and needs them all working.
   PRD ref: `prd.md > The Core Journey` (step 5), `prd.md > Features and Behavior > Auto-advance to the next place`
@@ -52,7 +52,7 @@ Build mode: fast
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 1. Learner has no Google Maps API key yet, so live 3D-tile rendering is deferred to the final review; build verified via compile + clean dev-server boot, and the no-key fallback card confirmed. No look/camera change requested.
-- [ ] Final kick-the-tires exploration and feedback completed — after slice 4, the full loop
+- [x] Final kick-the-tires exploration and feedback completed — app runs via `npm.cmd run dev`; live 3D is key-gated (learner has no Google key yet) so it shows the fallback card, and automated verification covers the rest (12/12 tests, clean boot). Learner reviewed free-map alternatives and decided to keep Google Photorealistic 3D Tiles (the only source that preserves the recognition kernel). No functional changes requested.
 
 ## Final Review
 
@@ -60,14 +60,16 @@ Build mode: fast
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
 - [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: [to fill after wrap-up]
-Route and stops: [to fill after wrap-up]
-Edit outcome: [to fill after wrap-up]
-Reflection: [to fill after wrap-up]
-Activity mode: [to fill after wrap-up]
+Activity and evidence: Focused alternative (experienced plan-first learner). Connected the testing goal to a real build decision — extracting all game logic into the pure `src/lib/gameState.js` reducer because the Google 3D tiles layer can't be unit-tested. Evidence cited: `tests/gameState.test.js` "wraps back to the first location after the last" (the PRD loop decision as an executable assertion), 12/12 tests passing.
+Route and stops: Reference route in app-map.html — gameState.js (placeGuess/advance), distance.js (haversineKm), App.jsx (REVEAL_LINGER_MS + timer), components/, data/locations.js. Symbols/paths verified against source via grep.
+Edit outcome: not applicable — focused alternative, no code edit; learner declined no specific edit (none offered as the connection was to existing test evidence).
+Reflection: pending — optional transfer question offered at hand-off.
+Activity mode: focused alternative (evidence-based), app map generated from commit 235287e.
 
 ## Revisions
+
+- Extracted game-state transitions into a pure `src/lib/gameState.js` reducer (and created `src/lib/distance.js` during slice 2 instead of slice 3) — the build showed the lock/score/advance logic is far more reliably verifiable as pure functions than through simulated Leaflet DOM clicks in jsdom. Internal design choice; preserves all learner product decisions. `distance.js` is still exercised by its own unit test in slice 3 as planned.
