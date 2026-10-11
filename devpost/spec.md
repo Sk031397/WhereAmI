@@ -3,194 +3,179 @@ doc: spec
 status: approved
 ---
 
-# Matchday Hop — Technical Spec
+# Where Am I? — Technical Spec
 
 ## How This Works, In Plain Language
 
-Matchday Hop is a single web page that runs a 3D world in your browser using **Three.js** (a JavaScript 3D library) with **WebXR** so it's headset-ready, but driven by mouse and keyboard on desktop for this POC. There's no server and no database — everything runs in the browser, and the one thing that needs to be remembered between visits (your collected-cards log) is written to **localStorage**, the browser's per-site sticky note.
+"Where Am I?" is a single-page **React** web app that runs in the browser. The screen is filled by a photorealistic 3D view of a real place, served by **Google's Photorealistic 3D Tiles** (the same imagery that powers Google Earth). In the corner floats a small **Leaflet** map — a lightweight world map using free OpenStreetMap tiles — where you drop your guess.
 
-The world is one continuous first-person scene. You start outside a stylized Stamford Bridge, walk up and in, and roam. Invisible **trigger zones** (we check, every frame, whether your camera has walked into a box in space) pop up info cards about the rivalry. Pressing **J** opens your log of collected cards; pressing **M** opens a map overlay. On the map you pick the rival ground and a travel mode (Bus), and a scripted **cinematic camera flythrough** plays — the camera flies along a pre-planned path across a low-poly stylized "London" with matchday crowd sound — then deposits you outside the Emirates, where the whole loop repeats in red.
+The game knows a short, hand-picked list of real locations, written directly into the code. Each entry says where to point the 3D camera (so you drop into the right spot) and the true latitude/longitude of that place (so the game can score you). When you click the corner map, the app measures the straight-line distance between your pin and the real spot, shows that number in a bold scoreboard, and reveals the true location on the map. After about 5 seconds it moves to the next place, looping back to the first after the last one.
 
-The overlays (cards, log, map) are plain HTML/CSS layered on top of the 3D canvas, not drawn inside the 3D scene. That's deliberate: HTML text is sharper, easier to style, and far cheaper to build than in-world 3D panels, and for a desktop POC it reads perfectly.
-
-Why this shape: no backend means nothing to deploy or secure, the whole thing is a static site you can record locally and push to GitHub, and the only moving parts are the ones that actually prove the idea — the journey and the geofence cards.
+Nothing is saved between sessions — refresh and you start over. There's no database, no login, and no server of our own: just a React app, one Google API for the 3D world, and free map tiles for the guess map. This shape keeps the build small while protecting the one thing that makes the game work — a real, recognizable place you can fly through.
 
 ## The Core Journey Through the System
+Implements `prd.md > The Core Journey`.
 
-PRD ref: `prd.md > The Core Journey`.
+1. **Load / arrival** — the app reads the first entry in the in-code `locations` list → positions the Google 3D camera at that entry's start view → renders the Leaflet guess-map in the corner with no pin. No label shown. (`prd.md > The Core Journey` steps 1–2.)
+2. **Explore** — the player flies/looks around; the Google 3D Tiles layer handles all camera movement. (`prd.md > Features and Behavior > Fly and explore the 3D scene`.)
+3. **Guess** — the player clicks the Leaflet map → a marker is placed at the clicked lat/lng and the guess locks instantly (no confirm, no re-click that round). (`prd.md > Features and Behavior > Drop a pin to guess`.)
+4. **Score + reveal** — the app computes great-circle distance (Haversine) between the pin and the entry's true lat/lng → shows the distance in the scoreboard overlay → drops a second marker on the Leaflet map at the true location. The 3D view stays interactive. (`prd.md > Features and Behavior > See how close you were`.)
+5. **Linger + advance** — after ~5 seconds, the app advances to the next index in the list, wrapping back to 0 after the last entry, and resets the guess state. (`prd.md > Features and Behavior > Auto-advance to the next place`.)
 
-1. **Load** → Vite serves `index.html`; `main.js` boots the Three.js renderer, loads the Stamford Bridge scene, and places the first-person camera outside it. (`prd.md > The Core Journey` step 1)
-2. **Tutorial** → a small controls module watches your first movement/pan/interact and reveals the matching hint as HTML, non-blocking. (`prd.md > Exploring a stadium`)
-3. **Move** → keyboard (WASD/arrows) drives position, mouse drives camera pan, each frame in the render loop. (`prd.md > Exploring a stadium`)
-4. **Enter a zone** → every frame, the zone system checks the camera position against each zone's bounding box; on entry it fires an event. (`prd.md > Geofence info-zones and cards`)
-5. **Card appears** → the card overlay slides in with that zone's content, writes the card ID to the log store (localStorage), and auto-dismisses after ~5–10s. Movement never stops. (`prd.md > Geofence info-zones and cards`)
-6. **J → log** → reads the log store and renders the collected cards (or the empty state). (`prd.md > The collected-cards log`)
-7. **M → map** → the map overlay shows both grounds, "You are here," and travel-mode choices. (`prd.md > The map and travel selection`)
-8. **Pick Bus** → the journey controller takes over: hides overlays, plays the scripted camera animation along the spline over low-poly London, plays the soundscape, offers Skip. (`prd.md > The journey simulation`)
-9. **Arrive** → the controller swaps the active scene to the Emirates and places the camera outside it — back to step 2, in red. (`prd.md > The journey simulation`, `prd.md > The Core Journey` step 9)
+```
+┌───────────────────────────────────────────────┐
+│  Google Photorealistic 3D Tiles (fills screen) │
+│                                                 │
+│                               ┌───────────────┐ │
+│   [ scoreboard overlay ]      │ Leaflet guess │ │
+│                               │ map (corner)  │ │
+└───────────────────────────────┴───────────────┘ │
+        │ click                         ▲
+        ▼                               │ markers
+   Haversine distance ─────────────────┘
+```
 
 ## Stack
 
-- **Language:** JavaScript (ES modules), HTML, CSS.
-- **3D / XR:** [Three.js](https://threejs.org/docs/) (`three`, latest stable) — WebGL renderer, scene graph, `WebXR` support, `PointerLockControls` for first-person look, and the `AnimationMixer` / `CatmullRomCurve3` tools for the scripted journey camera. Chosen because the learner has shipped VR and wants direct control over the cinematic journey camera and the stylized look rather than a framework's abstraction. Tradeoff accepted: more plumbing (render loop, controls, zone checks) written by hand.
-- **Build / dev server:** [Vite](https://vitejs.dev/guide/) — `npm run dev` for hot-reload iteration, `npm run build` for a static bundle. Chosen for fast iteration while tuning the cinematic camera and a clean static output for the public repo. Tradeoff: one Node install up front.
-- **Persistence:** browser [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) — holds collected-card IDs as JSON. Chosen because the cross-session log needs no infrastructure. (Learner chose to keep cross-session persistence.)
-- **Audio:** HTML5 `Audio` / Web Audio for the matchday soundscape loop during the journey.
-- **Unverified / check early in build:** exact current `three` version and whether `PointerLockControls` is imported from `three/addons/`. Flag to confirm against the docs on first `npm install`.
+- **React 18** + **Vite** — the app shell and dev server. Vite is the lightest way to run a React app locally and record the demo. Chosen for fit with the learner's React/JS background. Docs: https://react.dev/ , https://vitejs.dev/
+- **Google Maps Platform — Photorealistic 3D Tiles**, rendered via the Maps JavaScript API `Map3DElement` (experimental/`alpha` channel). Source of the flyable real-world 3D. Requires a GCP Maps API key with the Map Tiles API / 3D Tiles enabled. This is the kernel and the one hard external dependency. Docs: https://developers.google.com/maps/documentation/javascript/3d-maps-overview
+- **Leaflet 1.9.x** + **react-leaflet 4.x** — the lightweight corner guess-map. Click-to-place-marker is trivial and OpenStreetMap tiles need no key. Chosen by the learner over MapLibre for lightness. Docs: https://leafletjs.com/ , https://react-leaflet.js.org/
+- **OpenStreetMap raster tiles** — free base tiles for the Leaflet map (respect OSM tile usage policy; fine for a demo). Docs: https://wiki.openstreetmap.org/wiki/Raster_tile_providers
+- **Vitest** + **@testing-library/react** — unit and integration tests. Vitest is the native test runner for Vite projects. Docs: https://vitest.dev/ , https://testing-library.com/docs/react-testing-library/intro/
+
+> **To verify early in the build:** the exact current API for Google `Map3DElement` and its camera/`flyCameraTo` options, and which Maps JS API channel (`alpha`/`beta`) exposes it. This is experimental and its surface changes; confirm against the live docs before wiring the 3D camera, rather than trusting a remembered signature.
 
 ## Where It Runs and How Someone Tries It
+Implements the submission needs for `6-ship`.
 
-- **Runtime:** desktop browser (Chrome/Edge recommended for WebXR), mouse + keyboard. No API keys, no accounts.
-- **Environment:** Node.js (for Vite dev/build) — install once.
-- **Start it:**
-  ```
-  npm install
-  npm run dev      # opens a local dev URL, e.g. http://localhost:5173
-  ```
-  Open the printed URL, click the canvas to capture the mouse, and move with WASD.
-- **Build a static bundle:** `npm run build` → `dist/` (what gets pushed / optionally hosted).
-- **Demo:** submission requires a short demo video **and** a public GitHub repository. Running locally and recording the ~1-minute loop (Stamford Bridge → cards → map → Bus → journey → Emirates) is sufficient. **Deployment is optional** and not planned for the POC; revisit in `6-ship` if a shareable link is wanted (Vite's `dist/` drops onto any static host).
+- **Runtime:** browser, served by the Vite dev server locally.
+- **Environment:** Node.js 18+; a Google Maps Platform API key in a local `.env` file (`VITE_GOOGLE_MAPS_API_KEY`). No key needed for the Leaflet/OSM map.
+- **Start:** `npm install` then `npm run dev`, open the printed `http://localhost:5173`.
+- **Demo:** record the browser locally — drop into a place, fly, drop a pin, show the distance + true-location reveal, let it auto-advance. Submission requires a short demo video **and** a public GitHub repo.
+- **Deployment:** optional, deferred to `6-ship`. Keeping it local for now; the video is sufficient for submission. (If later deployed, note the API key must be domain-restricted.)
 
 ## Look and Feel
+Carried from `prd.md > Look and Feel` and `scope.md > Inspiration & Identity`. Direction, not a full design system.
 
-Carried forward from `prd.md > Look and Feel` and `scope.md > Inspiration & Identity` — do not re-interview.
-
-- **Mood:** vibrant, saturated, playful, arcade-leaning; explicitly not photoreal.
-- **Palette:** Stamford Bridge evoked with a Chelsea-ish **blue**, Emirates with an Arsenal-ish **red** — colors that *suggest* each club **without exact brand colors**. Generic/original stand and crest shapes, no real logos or replica geometry.
-- **Geometry:** low-poly stylized stadiums (recognizable as "a stadium," not a replica) and abstract low-poly "London" for the journey.
-- **Interface copy:** short, game-like, energetic. Overlays are clean HTML cards with strong color blocking per ground.
-- **Stack honor:** Three.js handles all of this directly; HTML/CSS overlays keep text crisp and on-brand per ground.
+- **Energy:** game-like personality — a bold scoreboard and a punchy result reveal — inside a cinematic, immersive-luxury frame. The 3D world is the star; UI never competes with it.
+- **Panels:** floating, with deep soft drop shadows that separate them from the 3D canvas. Generous internal whitespace.
+- **Typography:** elegant, wide letter-spacing, editorial character (e.g., a refined serif or a wide-tracked sans for the scoreboard numbers).
+- **Palette:** warm dark tones — charcoal / deep espresso — paired with soft off-whites.
+- **Avoid:** generic AI-app default styling; cramped or busy overlays.
+- **Stack note:** all of this is plain CSS over React components; the stack imposes no limits on honoring it. The Leaflet panel is styled with a rounded container + shadow to match the floating-panel language.
 
 ## Components
 
-### World / Renderer (`src/core/`)
-Boots the Three.js `WebGLRenderer`, scene, camera, lights, render loop, and WebXR session. Owns the per-frame `update()` that drives controls, zone checks, and the journey animation.
-PRD ref: `prd.md > Screens and Surfaces` (the stadium world).
+### `App`
+Top-level state and round orchestration: current location index, guess state (`exploring` → `locked`/`revealed`), the ~5s linger timer, and advance-with-wraparound. Holds the `locations` list.
+PRD ref: `prd.md > The Core Journey`, `prd.md > Features and Behavior > Auto-advance to the next place`.
 
-### Scenes (`src/scenes/`)
-Two stylized stadium scenes (Stamford Bridge, Emirates), each: exterior shell, interior bowl, entrance you can walk through, spawn point, and its zone + card data. A `SceneManager` loads/swaps the active scene and places the camera outside on arrival.
-PRD ref: `prd.md > Exploring a stadium (outside and in)`, `prd.md > The Core Journey`.
+### `World3D`
+Wraps the Google `Map3DElement`. Receives the current location's camera start view and positions the 3D camera. Stays interactive throughout, including during the reveal.
+PRD ref: `prd.md > Features and Behavior > Fly and explore the 3D scene`.
 
-### First-person Controls + Tutorial (`src/controls/`)
-Keyboard movement, mouse-look (`PointerLockControls`), and a contextual tutorial that reveals movement → pan → interact hints as the player first does each, without blocking movement.
-PRD ref: `prd.md > Exploring a stadium (outside and in)`.
+### `GuessMap`
+Leaflet map in the corner. Handles the map click → places the guess marker and reports the clicked lat/lng up to `App`; after lock, renders the true-location marker. Disables further clicks once locked.
+PRD ref: `prd.md > Features and Behavior > Drop a pin to guess`.
 
-### Zone System (`src/zones/`)
-Axis-aligned bounding boxes placed outside and inside each stadium (2–3 per ground). Each frame, checks whether the camera entered a zone and emits an enter event; supports re-entry.
-PRD ref: `prd.md > Geofence info-zones and cards`.
+### `Scoreboard`
+The bold overlay. Shows round framing while exploring and the distance number on reveal, in the cinematic-luxury style.
+PRD ref: `prd.md > Features and Behavior > See how close you were`.
 
-### Card Overlay (`src/ui/card`)
-Non-blocking HTML panel that slides in on zone entry, shows that zone's rivalry fact, writes the card to the log store, and auto-dismisses after ~5–10s. Different content per ground.
-PRD ref: `prd.md > Geofence info-zones and cards`, `prd.md > States and Boundaries` (Card showing).
+### `lib/distance.js`
+Pure Haversine great-circle distance between two lat/lng points, returned in km. The unit-tested core of scoring.
+PRD ref: `prd.md > Features and Behavior > See how close you were`.
 
-### Log Overlay (`src/ui/log`)
-Toggled by **J**. Reads the log store and lists collected cards; shows "No cards collected yet" when empty.
-PRD ref: `prd.md > The collected-cards log (J)`, `prd.md > States and Boundaries` (Empty log).
-
-### Map Overlay (`src/ui/map`)
-Toggled by **M**. London atlas/compass styling, a labeled pin per ground, "You are here" on the current stadium, travel-mode choices (Bus) on clicking the destination pin. Clicking the current-stadium pin is inactive / shows a brief "you're already here" nudge.
-PRD ref: `prd.md > The map and travel selection (M)`, `prd.md > States and Boundaries` (Already here).
-
-### Journey Controller (`src/journey/`)
-On Bus selection: hides overlays, animates the camera along a `CatmullRomCurve3` spline across the low-poly "London" geometry (~30s, sweeping/panoramic), plays the matchday soundscape, shows a Skip control, and on finish or skip hands off to `SceneManager` to load the destination exterior.
-PRD ref: `prd.md > The journey simulation (the kernel)`, `scope.md > The Unique Kernel`.
-
-### Log Store (`src/state/logStore.js`)
-Thin wrapper over `localStorage`: `getCollected()`, `addCard(id)`, read-on-load. Single JSON key.
-PRD ref: `prd.md > The collected-cards log (J)` (persists across sessions), `prd.md > States and Boundaries` (Persistence).
-
-### Data (`src/data/`)
-Static definitions: per-stadium zones (position + box size) and card content (drafted rivalry facts), plus the two map pins and the spline path. No live services.
-PRD ref: `prd.md > Geofence info-zones and cards`, `prd.md > Product Decisions` (card text drafted by build).
+### `data/locations.js`
+The hand-picked list (see Data Model).
 
 ## Data Model
 
-All data is in-memory objects plus one persisted key. Nothing is on a server.
+A static, in-code array — no database, no fetch, no persistence (by learner decision; consistent with `prd.md > States and Boundaries > No persistence`).
 
-- **Stadium definition** (static, in `src/data/`): `{ id, name, colorTheme, spawn, zones[], cards{} }`.
-- **Zone** (static): `{ id, label, box: {center, size}, cardId }`. Lives in code; checked against camera position each frame; never updated at runtime.
-- **Card content** (static): `{ id, title, body }` — drafted rivalry facts, learner refines wording later (`prd.md > Product Decisions`).
-- **Collected log** (persisted): a JSON array of collected card IDs under a single `localStorage` key, e.g. `matchday-hop:log`.
-  - **Originates:** when a zone fires and the card shows.
-  - **Stored:** `localStorage` (survives closing the browser).
-  - **A → B:** `addCard(id)` reads the array, de-dupes, writes it back; the Log overlay reads it on **J**.
-  - **Leave and come back:** on load, `getCollected()` reads the key; empty/missing → empty state, otherwise the saved cards reappear.
-- **Runtime UI state** (in-memory, not persisted): which overlay is open, current stadium, whether a journey is playing.
+```js
+// data/locations.js
+export const locations = [
+  {
+    name: "Eiffel Tower, Paris",     // internal label, NOT shown to player
+    camera: {                        // where the 3D view starts
+      center: { lat: 48.8584, lng: 2.2945, altitude: 300 },
+      heading: 25, tilt: 65, range: 1200
+    },
+    answer: { lat: 48.8584, lng: 2.2945 }  // true location for scoring
+  },
+  // ... a small hand-picked set (enough for a round or two)
+];
+```
+
+- **Where it lives:** in the bundled source. Loaded once at startup.
+- **How it updates:** it doesn't — it's read-only reference data.
+- **Leaving and coming back:** no persistence; a refresh restarts from index 0.
+- **Runtime state** (not stored): `currentIndex`, `guessLatLng`, `phase` (`exploring`/`revealed`), `distanceKm` — all in React state, gone on refresh.
+
+> The `camera` values are illustrative and must be hand-tuned per location during the build so each drops the player into a recognizable, well-framed view. Labelled as placeholder sample data until tuned.
 
 ## File Structure
 
 ```
 basic_ai/
-├── index.html                 # single page; mounts the canvas + overlay root
-├── package.json               # three, vite
+├── index.html
+├── package.json
 ├── vite.config.js
-├── public/
-│   └── audio/
-│       └── matchday-soundscape.*   # crowd/ambience loop for the journey
+├── .env                      # VITE_GOOGLE_MAPS_API_KEY (gitignored)
+├── .env.example              # documents the key name, no secret
 ├── src/
-│   ├── main.js                # entry: boot renderer, wire modules, start loop
-│   ├── core/
-│   │   ├── renderer.js        # WebGLRenderer + WebXR + render loop
-│   │   └── sceneManager.js    # load/swap active stadium scene, place camera
-│   ├── scenes/
-│   │   ├── stamfordBridge.js  # blue stylized ground geometry + spawn
-│   │   └── emirates.js        # red stylized ground geometry + spawn
-│   ├── controls/
-│   │   ├── firstPerson.js     # keyboard move + PointerLock look
-│   │   └── tutorial.js        # progressive contextual control hints
-│   ├── zones/
-│   │   └── zoneSystem.js      # per-frame bounding-box enter checks
-│   ├── journey/
-│   │   ├── journeyController.js   # spline camera animation + skip + handoff
-│   │   └── londonScene.js         # low-poly abstract city flythrough geometry
-│   ├── ui/
-│   │   ├── card.js            # non-blocking card overlay + auto-dismiss
-│   │   ├── log.js             # J overlay, empty state
-│   │   └── map.js             # M overlay, pins, "you are here", travel modes
-│   ├── state/
-│   │   └── logStore.js        # localStorage read/write wrapper
-│   └── data/
-│       ├── stadiums.js        # zones + card content per ground
-│       └── mapConfig.js       # pins, labels, spline path
-├── devpost/                   # Devpost learning workspace (specs, prd, etc.)
-└── README.md
+│   ├── main.jsx              # React entry
+│   ├── App.jsx               # round orchestration + state
+│   ├── components/
+│   │   ├── World3D.jsx       # Google Photorealistic 3D Tiles view
+│   │   ├── GuessMap.jsx      # Leaflet corner map + pin logic
+│   │   └── Scoreboard.jsx    # cinematic scoreboard overlay
+│   ├── lib/
+│   │   └── distance.js       # Haversine (pure, unit-tested)
+│   ├── data/
+│   │   └── locations.js      # hand-picked static location list
+│   └── styles/
+│       └── app.css           # cinematic-luxury styling
+├── tests/
+│   ├── distance.test.js      # unit: distance calc
+│   └── round-flow.test.jsx   # integration: guess → reveal → advance/loop
+└── devpost/                  # Devpost learning workspace
 ```
 
 ## External Services and Dependencies
 
-None at runtime. No APIs, databases, hosting, or keys. The only external dependencies are build-time npm packages:
-
-- **three** — [docs](https://threejs.org/docs/). Free, open source.
-- **vite** — [docs](https://vitejs.dev/guide/). Free, open source.
-
-Audio assets (matchday soundscape) are bundled locally in `public/audio/` — source a royalty-free crowd/ambience clip during the build; no runtime fetch.
+- **Google Maps Platform — Map Tiles API / Photorealistic 3D Tiles** (via Maps JS API `Map3DElement`).
+  - Auth: API key, loaded client-side via the Maps JS bootstrap loader with the appropriate (`alpha`/`beta`) version channel.
+  - Key: `VITE_GOOGLE_MAPS_API_KEY` from `.env`; restrict by HTTP referrer for any deploy.
+  - Cost/limits: Google Maps Platform has a monthly free credit; 3D Tiles usage counts against it. For a hand-picked demo set the usage is tiny, but confirm current pricing/quota in the console.
+  - Docs: https://developers.google.com/maps/documentation/javascript/3d-maps-overview
+- **OpenStreetMap tile server** (Leaflet base layer).
+  - Auth: none. Follow the OSM tile usage policy (set a proper attribution; fine for low-volume demo use).
+  - Docs: https://operations.osmfoundation.org/policies/tiles/
 
 ## Important Failure Modes
 
-- **WebXR/WebGL unsupported or canvas fails to init** → show a plain HTML message ("This experience needs a WebGL-capable desktop browser") instead of a blank screen; the 2D overlays and map still convey the concept.
-- **Pointer lock not engaged (user hasn't clicked the canvas)** → movement/look feel dead; show a persistent "Click to look around" prompt until lock is acquired.
-- **Audio blocked by browser autoplay policy** → the journey still plays silently; trigger audio on the Bus-selection click (a user gesture) so it's allowed, and don't let a missing/blocked clip stop the animation.
-- **`localStorage` unavailable or corrupt JSON** → fall back to in-memory session log so the app still runs; the log simply won't persist that session.
+- **Google 3D Tiles fail to load** (bad/absent key, quota, network) → the screen can't show the kernel. Fallback: a plain in-app message ("Couldn't load the 3D world — check the API key") instead of a blank/broken canvas, so the failure is legible during the demo.
+- **Player clicks the 3D view expecting to guess** → clicks there do nothing for scoring; only the Leaflet map registers a guess. Mitigation: the corner map is always visible and visually invites the click; keep its affordance clear.
+- **OSM tiles slow/unavailable** → the guess-map base imagery is blank but the click/markers still work (distance still computes). Acceptable degraded state for the demo.
 
 ## What Was Simplified and Why
 
-- **localStorage instead of a hosted database** — same shape of data (a list of collected IDs), zero infrastructure, and it satisfies "persists across sessions." A real DB would add an account, a service, and a key for no POC benefit.
-- **HTML/CSS overlays instead of in-world 3D panels** — crisper text and far faster to build for a desktop POC; in-world panels would be the fuller VR-native version but cost significant layout work that doesn't prove the kernel.
-- **Abstract low-poly "London" instead of real geo-tiles** — a deliberate scope decision (`scope.md > Explicitly Cut`); keeps the flythrough genuinely 3D and immersive while buildable in the budget. The fuller version (Google 3D tiles) isn't WebXR-native and would blow the time budget.
-- **Stylized bounding-box zones instead of real geofencing** — the "geofence" is a box-vs-camera check each frame; same trigger behavior, no GPS/map service. Reborn from the learner's AR-geofence work in VR form.
-- **Bus as the only travel mode** — per `prd.md > Product Decisions`; flight deferred.
-- **Card text as drafted stubs** — labeled as draft rivalry facts; learner refines wording later (not a blocker).
+- **Static in-code location list** instead of a database or an external "random place" service — a small hand-picked set fully proves the recognition kernel with zero infrastructure and total control over which recognizable places appear. The fuller version (large/randomized pool) is deferred per `prd.md > Deferred From the POC`.
+- **No persistence / no accounts** — refresh restarts the game. Nothing about scoring a single guess needs saved state. (`prd.md > States and Boundaries`.)
+- **Loop back to the first location** after the last, instead of an end-of-game tally screen — keeps continuous play with no extra UI; aggregate scoring is deferred per `prd.md > Deferred From the POC`.
+- **Leaflet + OSM** instead of a heavier mapping SDK — the guess-map only needs click-to-place and a reveal marker, so the lightest option with no API key is the right size.
 
 ## Decisions and Open Issues
 
-**Learner choices (consequential, agreed):**
-- **Engine: Three.js** — direct control over the cinematic camera and stylized look, matching the learner's VR background. Tradeoff: more plumbing written by hand (render loop, controls, zone checks).
-- **Build/run: Vite + local recording** — fast iteration + clean static bundle; no deployment for the POC. Tradeoff: one Node install.
-- **Persistence: localStorage** — keeps cross-session log cheaply. (PRD flags this as first-to-drop if the build runs tight; staying in for now.)
-- **Journey beat: scripted 3D camera flythrough over low-poly stylized London** — keeps the kernel genuinely immersive and panoramic while buildable. Tradeoff: a bit of in-between city geometry to build vs. a flat 2D transition.
+- **React + Vite web app** — learner's stack; natural fit for 3D tiles + a browser map. Tradeoff: client-side only, so the API key is exposed in the browser (standard for Maps JS; mitigated by referrer restriction).
+- **Google Photorealistic 3D Tiles for the world** — the only realistic way to get flyable, recognizable real places; it *is* the kernel. Tradeoff accepted: one hard external dependency and a required GCP key.
+- **Leaflet (over MapLibre) for the guess-map** — learner's choice for lightness; OSM tiles mean no second key.
+- **Static in-code location list; loop back after the last** — learner's choice. Resolves `prd.md > Open Questions` (end-of-set behavior = loop).
+- **Local-only run for now** — deployment deferred to `6-ship`; local recording satisfies submission.
+- **Testing approach** (ties to `learner-profile.md > Desired Learning Outcome`): unit tests for `lib/distance.js` (known city pairs → expected km) and round-advance/loop logic; integration test for the guess → reveal → advance flow with the Leaflet map (React Testing Library); manual smoke test for the Google 3D view in the demo recording, since the external tiles layer can't be meaningfully unit-tested.
 
-**Implementation details derived (not learner-authored):** per-frame bounding-box zone checks, `PointerLockControls` for look, `CatmullRomCurve3` spline for the journey camera, HTML/CSS overlays over the canvas, single JSON `localStorage` key.
+**One genuine uncertainty (the learner's least-sure spot):** testing the 3D tiles layer. Resolved by design — the pure/stateful logic is covered by automated unit + integration tests, and the inherently-visual 3D layer is covered by a documented manual smoke test rather than pretending to unit-test an external rendering surface. To verify during the build: the live `Map3DElement` camera API (noted under Stack) before wiring `World3D`.
 
-**One learner uncertainty discussed:** how the "geofence" translates into code for a WebXR scene without GPS. Clarified: each zone is an axis-aligned box in the scene, and the render loop checks the camera's position against those boxes every frame — the same enter-a-zone-unlock-content behavior from the learner's AR-geofencing work, now done against world coordinates instead of GPS.
-
-**Open questions carried from `prd.md > Open Questions`:** exact card wording (build drafts stubs, learner refines — not blocking); factual confirmations for *later-tier* stadiums (not in this POC). Neither blocks the build.
+**Open issues:** none blocking. The only build-time verification is confirming the current Google 3D Maps API surface before implementing `World3D`.

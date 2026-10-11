@@ -9,50 +9,50 @@ Build mode: fast
 
 ## Slices
 
-- [x] **1. You stand outside a stylized Stamford Bridge and walk around it (first-person)**
-  Becomes usable: A running app that opens on a lit, blue stylized Stamford Bridge exterior; you click to capture the mouse, move with WASD, pan with the mouse, and a contextual tutorial reveals controls as you first use them.
-  Why now: Bootstrapping has to live somewhere, and this one slice proves the whole rendering/controls spine (Vite + Three.js, render loop, PointerLock look, movement, tutorial) with something you can actually walk around in.
-  PRD ref: `prd.md > The Core Journey` (steps 1-3), `prd.md > Exploring a stadium (outside and in)`
-  Spec ref: `spec.md > Components` (World/Renderer, First-person Controls + Tutorial, Scenes), `spec.md > File Structure`, `spec.md > Look and Feel`, `spec.md > Where It Runs and How Someone Tries It`
-  Build: Scaffold per spec file structure (`index.html`, `package.json`, `vite.config.js`, `src/`). Install `three` and `vite` (confirm current `three` version and whether `PointerLockControls` is in `three/addons/` against the docs on first install). Build `core/renderer.js` (WebGLRenderer + render loop), `core/sceneManager.js` (load/place active scene), `scenes/stamfordBridge.js` (low-poly blue exterior + interior bowl + walk-in entrance + spawn), `controls/firstPerson.js` (WASD + PointerLock look), `controls/tutorial.js` (progressive hints), and a "Click to look around" / WebGL-unsupported fallback. Wire in `main.js`.
-  Verify (mechanical): Run `npm run dev`, confirm it starts with no errors and the dev URL serves the page; open it, click the canvas, and confirm the camera moves with WASD and pans with the mouse, and the first tutorial hint appears.
-  Learner check: Open the app, click to capture the mouse, walk up to and into the stadium, and say whether the look, feel, and controls match what you pictured.
-  Commit: `Scaffold Matchday Hop: Stamford Bridge scene with first-person controls and tutorial`
+- [ ] **1. The app runs and drops you into a real 3D place you can fly around**
+  Becomes usable: `npm run dev` opens a React app whose screen is filled by Google's Photorealistic 3D Tiles, dropped into the first hand-picked location, and you can look/fly around it. This is the kernel, built first.
+  Why now: The flyable real-world 3D *is* the game (`scope.md > The Unique Kernel`) and it's the riskiest piece — an experimental Google API. Proving it loads and flies on slice one means every later slice lands on solid ground, and if the API surface differs from the spec we find out immediately.
+  PRD ref: `prd.md > The Core Journey` (steps 1-2), `prd.md > Features and Behavior > Fly and explore the 3D scene`
+  Spec ref: `spec.md > Stack`, `spec.md > File Structure`, `spec.md > Components > World3D`, `spec.md > Data Model`, `spec.md > External Services and Dependencies`
+  Build: Scaffold React + Vite per the spec file structure, install deps, add `.env.example` + `.env` for `VITE_GOOGLE_MAPS_API_KEY`, create `data/locations.js` with the hand-picked list (camera start + answer coords), and build `World3D` to load the Maps JS `Map3DElement` and position the camera at the first location. Apply `spec.md > Look and Feel` (full-screen 3D canvas) from the start.
+  Verify (mechanical): Confirm the latest `Map3DElement`/camera API against the live Google docs before wiring (spec flagged it experimental). Run `npm run dev`, confirm it starts with no console errors, and confirm the 3D tiles render a recognizable place that responds to drag/zoom. If the key/tiles fail, confirm the legible fallback message shows instead of a blank canvas.
+  Learner check: Open the app, fly around the first place, and say whether that "dropped into a real place" feeling lands the way you pictured.
+  Commit: `Scaffold app and render flyable Photorealistic 3D Tiles`
 
-- [x] **2. Walk into zones and collect rivalry cards, reviewable in the log (J)**
-  Becomes usable: Walking into 2-3 geofence zones (outside and inside Stamford Bridge) pops a non-blocking rivalry card that auto-dismisses after ~5-10s; each card saves to your log; pressing J opens the collected-cards log (with an empty state), and it persists across restarts.
-  Why now: Completes the single-stadium loop and exercises the data model + localStorage persistence early, where mistakes are cheap to fix.
-  PRD ref: `prd.md > Geofence info-zones and cards`, `prd.md > The collected-cards log (J)`, `prd.md > States and Boundaries`
-  Spec ref: `spec.md > Components` (Zone System, Card Overlay, Log Overlay, Log Store, Data), `spec.md > Data Model`, `spec.md > Important Failure Modes`
-  Build: Add `data/stadiums.js` (Stamford Bridge zones: box center/size + card content with drafted rivalry facts). Build `zones/zoneSystem.js` (per-frame AABB camera-vs-box enter checks, supports re-entry), `ui/card.js` (non-blocking slide-in overlay, auto-dismiss ~5-10s, writes to log), `state/logStore.js` (localStorage wrapper: getCollected/addCard, de-dupe, in-memory fallback on corrupt/unavailable), `ui/log.js` (J toggle, lists collected cards, "No cards collected yet" empty state). Wire zone checks into the render loop and the J keybind.
-  Verify (mechanical): Run the dev server; walk into a zone and confirm the card appears without stopping movement and auto-dismisses; press J before and after collecting to confirm empty state then listed cards; add two cards, restart the server, reload, and confirm they persist via localStorage.
-  Learner check: Collect a couple of cards, open the log with J, restart the app, and confirm your collected cards are still there.
-  Commit: `Add geofence zones, rivalry cards, and persistent collected-cards log`
+- [ ] **2. A corner map is always on screen and you can drop a pin on it**
+  Becomes usable: A small Leaflet map floats in the corner over the 3D view; clicking it drops a single marker and locks it (one guess, no re-click).
+  Why now: The guess surface is the second half of the core loop. Adding it now — before scoring — lets us confirm the always-visible corner panel and the instant-lock interaction feel right before wiring numbers to it.
+  PRD ref: `prd.md > The Core Journey` (step 3), `prd.md > Features and Behavior > Drop a pin to guess`, `prd.md > Screens and Layout`
+  Spec ref: `spec.md > Components > GuessMap`, `spec.md > Stack` (Leaflet/react-leaflet/OSM), `spec.md > Look and Feel`
+  Build: Add Leaflet + react-leaflet + OSM tile layer. Build `GuessMap` as a floating corner panel (shadowed, rounded, per Look and Feel). Handle map click → place one marker, report lat/lng up to `App`, and disable further clicks once locked. Hold `guessLatLng` and `phase` in `App` state.
+  Verify (mechanical): Run the app; confirm the corner map renders with OSM tiles, a click places exactly one marker, and a second click does nothing (lock holds). Confirm no console errors.
+  Learner check: Click the corner map to drop your pin, try clicking again, and confirm it locks on the first drop the way you wanted.
+  Commit: `Add always-on Leaflet guess map with instant pin lock`
 
-- [x] **3. Open the map (M), pick Bus, and watch the cinematic journey — the kernel**
-  Becomes usable: Pressing M opens the London atlas/compass map with a labeled pin per ground and "You are here"; clicking the destination pin reveals the Bus travel mode; selecting Bus plays a skippable ~30s cinematic camera flythrough over low-poly "London" with a matchday soundscape, then returns you to a stadium exterior.
-  Why now: This is the whole point of the app. Proving the cinematic journey feels right early means everything else is just setting — and if the camera path or pacing is wrong, we find out now, not last.
-  PRD ref: `prd.md > The map and travel selection (M)`, `prd.md > The journey simulation (the kernel)`, `scope.md > The Unique Kernel`
-  Spec ref: `spec.md > Components` (Map Overlay, Journey Controller, Data), `spec.md > Data Model`, `spec.md > Important Failure Modes` (audio autoplay), `spec.md > Look and Feel`
-  Build: Add `data/mapConfig.js` (two pins, labels, spline path points). Build `ui/map.js` (M toggle, atlas/compass styling, pins + "You are here", destination pin reveals Bus, current-stadium pin inactive with "you're already here" nudge). Build `journey/londonScene.js` (abstract low-poly city flythrough geometry) and `journey/journeyController.js` (hide overlays, animate camera along a `CatmullRomCurve3` spline ~30s, matchday soundscape triggered on the Bus-click user gesture so autoplay isn't blocked, Skip control, hand off to SceneManager on finish/skip). Source a royalty-free crowd/ambience clip into `public/audio/`. For this slice the handoff returns to Stamford Bridge (Emirates arrives in slice 4).
-  Verify (mechanical): Run the dev server; press M and confirm both pins + "You are here"; click the current pin and confirm it does NOT launch a journey; click the destination pin, select Bus, and confirm the cinematic flythrough plays over the low-poly city with sound, that Skip ends it immediately, and that it finishes at a stadium exterior with control returned.
-  Learner check: Open the map with M, pick Bus, and watch the journey — tell me whether the kernel ("the cool beat") feels the way you imagined, and what you'd change about the camera, pacing, or sound.
-  Commit: `Add map overlay and cinematic Bus journey simulation (kernel)`
+- [ ] **3. You get a distance score and the true location is revealed**
+  Becomes usable: After you lock a pin, a bold scoreboard shows how far off you were (km) and the true location appears on the corner map next to your pin.
+  Why now: This closes the recognition payoff — the "how close was I" moment (`scope.md > What "Working" Looks Like`). It depends on the pin (slice 2) and the location data (slice 1) already existing.
+  PRD ref: `prd.md > The Core Journey` (step 4), `prd.md > Features and Behavior > See how close you were`
+  Spec ref: `spec.md > Components > Scoreboard`, `spec.md > Components > lib/distance.js`, `spec.md > Data Model`, `spec.md > Look and Feel`
+  Build: Add `lib/distance.js` (pure Haversine → km). On pin lock, compute distance between the guess and the current location's `answer`, set `distanceKm` and `phase=revealed`. Build `Scoreboard` as the cinematic-luxury overlay showing the distance. Drop a second marker on `GuessMap` at the true location.
+  Verify (mechanical): Add and run a Vitest unit test for `distance.js` against known city pairs (expected km within tolerance). Run the app; confirm locking a pin shows a sensible distance number and the true-location marker appears. `npm.cmd test` passes.
+  Learner check: Drop a pin somewhere you know is wrong, and confirm the distance number and the revealed true location make sense and feel punchy.
+  Commit: `Add Haversine scoring and true-location reveal`
 
-- [x] **4. Arrive at a stylized Emirates and hop both directions**
-  Becomes usable: The Bus journey now deposits you outside a lit, red stylized Emirates with its own interior, zones, and rivalry cards; you can explore it, open the map, and hop back to Stamford Bridge — the full Core Journey loop works both directions.
-  Why now: It reuses everything proven in slices 1-3; the second ground is the payoff, not the risk, so it lands last.
-  PRD ref: `prd.md > The Core Journey` (steps 8-9), `prd.md > What We're Building` (two grounds, hop both directions)
-  Spec ref: `spec.md > Components` (Scenes, Scene Manager, Data), `spec.md > Look and Feel`, `spec.md > The Core Journey Through the System` (step 9)
-  Build: Add `scenes/emirates.js` (red low-poly exterior + interior bowl + entrance + spawn) and its Emirates zones + distinct card content in `data/stadiums.js`. Wire `sceneManager.js` so the journey controller's handoff loads the destination scene and places the camera outside it; make the map's destination resolve relative to the current stadium so hops work both ways (Stamford Bridge <-> Emirates). Confirm per-ground color blocking on overlays.
-  Verify (mechanical): Run the dev server; complete a Bus journey and confirm you arrive outside the red Emirates with its own zones/cards; collect an Emirates card and confirm it logs; open the map at the Emirates, confirm "You are here" moved, pick Bus, and confirm you arrive back at Stamford Bridge — the full loop runs end to end both directions.
-  Learner check: Run the whole ~1-minute loop (Stamford Bridge -> cards -> map -> Bus -> journey -> Emirates -> back), and tell me how the complete experience feels.
-  Commit: `Add Emirates scene and bidirectional stadium hopping`
+- [ ] **4. It lingers on the result, then auto-advances and loops**
+  Becomes usable: After the reveal, the result holds ~5 seconds (3D still flyable), then the game advances to the next location on its own, looping back to the first after the last.
+  Why now: This turns three static behaviors into the continuous "one more place" loop (`prd.md > The Core Journey` step 5). It's last because it orchestrates the slices beneath it and needs them all working.
+  PRD ref: `prd.md > The Core Journey` (step 5), `prd.md > Features and Behavior > Auto-advance to the next place`
+  Spec ref: `spec.md > Components > App`, `spec.md > The Core Journey Through the System`
+  Build: In `App`, after reveal start a ~5s timer, keep the 3D view interactive during it, then advance `currentIndex` (wrapping to 0 after the last entry) and reset `guessLatLng`/`phase` so the next place starts clean. Repoint `World3D` camera to the new location.
+  Verify (mechanical): Add a Vitest unit test for the advance-with-wraparound logic (last index → 0) and reset of guess state. Run the app; confirm after a guess it waits ~5s, the 3D stays draggable during the wait, then the next place loads, and that it loops after the final location. `npm.cmd test` passes.
+  Learner check: Make a guess, confirm you can still fly during the ~5s reveal, watch it move to the next place, and play through to confirm it loops back around.
+  Commit: `Add result linger, auto-advance, and loop`
 
 ## Hands-on Checkpoints
 
-- [x] Early usable behavior explored — after Slice 1 (look/feel + controls feedback shapes the rest of the build)
-- [ ] Final kick-the-tires exploration and feedback completed — after Slice 4 (full Core Journey loop)
+- [ ] Early usable behavior explored — after slice 1 (the kernel: flyable real 3D), where feedback can still shape the rest of the build
+- [ ] Final kick-the-tires exploration and feedback completed — after slice 4, the full loop
 
 ## Final Review
 
@@ -64,12 +64,10 @@ Build mode: fast
 - [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
 - [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: [what actually happened; real document/test/code references; unfinished work if interrupted]
-Route and stops: [actual paths and symbols; guided stops completed, or reference-only route]
-Edit outcome: [tried/kept/reverted/declined/not applicable; verification if changed]
-Reflection: [offered/answered/declined/already covered — personal answer belongs only in the ignored profile]
-Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
+Activity and evidence: [to fill after wrap-up]
+Route and stops: [to fill after wrap-up]
+Edit outcome: [to fill after wrap-up]
+Reflection: [to fill after wrap-up]
+Activity mode: [to fill after wrap-up]
 
 ## Revisions
-
-- Decoupled WASD movement from pointer lock — the build discovered that gating movement behind `locked === true` created a dead-input trap: whenever pointer lock dropped (Esc, clicking a map pin/button, tab-out) WASD silently stopped with no recovery. Movement now runs whenever controls are enabled and no blocking overlay is open; pointer lock governs only mouse-look. `inputBlocked` is recomputed each frame so it stays in sync however an overlay opens/closes.

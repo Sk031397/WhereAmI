@@ -3,50 +3,48 @@ doc: scope
 status: approved
 ---
 
-# Matchday Hop (working title)
+# Where Am I? — Guess the Place in Real 3D
 
-One line: A web-based WebXR experience where you stand immersed inside stylized football stadiums and travel between them, with the journey itself—a stylized bus/flight simulation—as the star of the show.
+One line: You get dropped into a real, photorealistic 3D location, fly around to look, and drop a pin on the world map to guess where you are.
 
 ## The Unique Kernel
-The **travel between arenas is the experience**, not the arenas themselves. You pick a destination stadium, choose a transit mode, and a stylized FIFA-career-mode-style journey simulation plays (route animating across the map, bus/flight ambience and sounds, a transition sequence) before you arrive immersed in the next ground. Delete the journey sim and it's just a stadium viewer—so the journey is the kernel.
+The thrill of recognition. The whole game lives in the moment you fly into a real 3D place and go "wait — that's *my* city / that's that landmark." Because the location is real and recognizable, exploring it in 3D is the game. Swap the real 3D world for a made-up one and the magic is gone — that's how you know this is the kernel.
 
 ## Who It's For
-A football/soccer fan like the learner—a Chelsea and Barcelona supporter—who enjoys the *ritual and travel* of matchday, not just the match. Someone who'd love an interactive, game-like way to "hop" between the grounds of teams they follow. Today they watch matches on TV and imagine the away-day experience; there's no playful, immersive way to travel the football world from a browser.
+Someone like you: a maps-and-places person who gets a kick out of recognizing somewhere real. They love the "I've been there / I know that skyline" feeling. Today they get a lighter version of this from GeoGuessr's street-view stills, but they want to actually *fly through* a place in 3D, not click through flat photos.
 
 ## The Core Loop
-First-person (you are the traveler—no avatar, no NPCs): **look around a stadium → walk into a geofence trigger zone → an info/stats card pops up → open the map and pick the next stadium → choose a travel mode → watch the journey simulation play → arrive immersed in the next stadium.** You come back to hop to another ground and see its scene + info zones.
+You're dropped into a photorealistic 3D location with no label. You fly and look around, reading the landmarks and layout for clues. When you think you know where you are, you drop a pin on a world map. One guess per round — you see how close you were, then move to the next place. You come back for the "aha" of recognizing somewhere and the pull of "one more place."
 
 ## Inspiration & Identity
-- FIFA career-mode transfer/transition simulators (the stylized "journey in progress" feel).
-- The learner's past AR-geofencing work—trigger zones that unlock content when you enter them, reborn in VR.
-- Mood: playful, game-like, immersive but not photoreal. Stylized stadiums that are clearly recognizable as "a stadium," not replicas.
-- Tech identity: browser-native WebXR (works on desktop with mouse/keyboard; headset-ready later), not a Google Photorealistic 3D Maps scene.
+- **GeoGuessr** — the core guess-your-location loop and the drop-a-pin answer mechanic, reimagined with flyable 3D instead of street-view stills.
+- **Google Earth / photorealistic 3D maps** — the "fly into a real place" feel is the draw.
+- Energy: the delight of recognition and a little showing-off ("I knew that was it").
+<!-- 3-prd will fill visual/look-and-feel gaps in 1-2 questions. -->
 
 ## Why This Matters to the Learner
-The learner is a big Premier League fan (Chelsea, Stamford Bridge) and a Barcelona fan, with deep VR/AR and geofencing experience. This revisits their AR-geofence background in an immersive web form and lets them explore immersive geospatial interaction hands-on. Stated interest: understanding immersive/geospatial web tech and building something that feels like a game.
+Maps and directions have always pulled at you, and the spatial side especially. This fuses that with gaming into something you'd actually want to pull up and play — and it's a clean vehicle for the real goal: driving an AI agent through a full workflow end to end and proving it works with rigorous testing.
 
 ## What "Working" Looks Like
-On screen in about a minute, in a browser: you start immersed inside a stylized **Stamford Bridge**, look around, walk into 2–3 geofence info-zones that pop up cards, open a London map, select **Emirates Stadium**, choose **bus**, and watch a short journey simulation (route hops across London, bus ambience/sounds, transition) before arriving immersed inside a stylized **Emirates**. 
-The "oh, that's cool" beat: **the bus journey animating across the city and depositing you, in VR, inside the rival's ground.**
+Someone opens it, gets dropped into a real 3D place, flies around, recognizes (or reasons out) where it is, drops a pin, and sees how close their guess was. The "oh, that's cool" beat: flying into a recognizable real location in 3D and the jolt of "I know this place" — then confirming it with the pin.
 
 ## The POC Boundary
-In:
-- Exactly **two stadiums**: stylized **Stamford Bridge** and stylized **Emirates** (both London; the "London Derby Hop").
-- First-person WebXR camera with desktop mouse/keyboard fallback.
-- **2–3 geofence trigger zones per stadium** that pop up an info/stats card on entry.
-- A simple **map/selection screen** to choose the next stadium.
-- **One travel mode headlined: bus**, with a stylized journey simulation (route animation across London + ambience/sound + transition).
+In scope — the minimum to prove the recognition kernel and the guess loop:
+- Load a real, photorealistic 3D location the player can look around / fly in.
+- A small hand-picked set of recognizable locations (enough to demo a round or two).
+- Drop-a-pin world map for guessing.
+- Score/feedback for a single guess: how close you were.
+- One round → result → next place.
 
 ## Later
-- The remaining stadiums as drop-in data: Tottenham Hotspur Stadium, Camp Nou (Barcelona), Santiago Bernabéu (Madrid), Mercedes-Benz Stadium (Atlanta), an LA stadium (Crypto.com Arena or SoFi—TBD), Hard Rock Stadium (Miami).
-- **Flight** travel mode for international/transatlantic hops (takeoff/cruise sounds, longer transition).
-- NPCs, a modeled main character, "day in the life of a fan" narrative layer.
-- Richer, higher-fidelity stadium models.
+- Larger / randomized pool of locations.
+- Multiple rounds with a running score and a final tally.
+- Difficulty levels (famous landmarks vs. obscure spots).
+- Multiplayer / head-to-head.
+- Leaderboards and sharing results.
 
 ## Explicitly Cut
-- **Real flight/bus/transit APIs** — would blow the 2–4 hour budget and aren't needed; a stylized simulation is cooler and more game-like anyway.
-- **NPCs and avatar/character animation** — a whole game-design layer that isn't the kernel; player is a first-person camera.
-- **Google Photorealistic 3D Maps / real geo-tiles** — not natively WebXR; chose a WebXR engine for true immersion instead (noted as a conscious tradeoff away from the Google-APIs learning goal in favor of the VR feel).
-- **Photoreal stadium replicas** — stylized recognizable stadiums are enough to prove the loop.
-
-<!-- Open factual items to confirm in PRD/later: Camp Nou is in Barcelona and Bernabéu in Madrid (learner slip said Camp Nou in Madrid); "Crypto Stadium LA" = Crypto.com Arena (indoor NBA arena) vs. a soccer venue like SoFi/BMO — confirm before adding these in the Later tier. -->
+- **AR / real-world walking.** You chose sit-at-a-screen; AR is a different build entirely and not needed to prove the kernel.
+- **Turn-by-turn navigation / directions.** The interest is spatial exploration, not routing.
+- **Retro/historical visual styling.** Considered, then set aside in favor of the gaming direction; the realism *is* the point here.
+- **Account systems / persistence.** Not needed to demonstrate the core loop in a 60-second video.

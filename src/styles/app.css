@@ -1,0 +1,81 @@
+/* Where Am I? — cinematic immersive-luxury styling.
+   See spec.md > Look and Feel: warm charcoal/espresso darks, soft off-whites,
+   floating shadowed panels, wide-spaced editorial type. The 3D world is the star. */
+
+:root {
+  --espresso: #1a1512;
+  --charcoal: #262220;
+  --offwhite: #f4efe9;
+  --muted: #b9ae9f;
+  --accent: #e8c89a;
+  --panel-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  --serif: "Georgia", "Times New Roman", serif;
+  --sans: "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background: var(--espresso);
+  color: var(--offwhite);
+  font-family: var(--sans);
+  overflow: hidden;
+}
+
+.app {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* The 3D world fills the screen — it is the star of the frame. */
+.world3d {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  background: radial-gradient(circle at 50% 40%, #2e2824, var(--espresso));
+}
+
+.world3d--error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.world3d__error-card {
+  max-width: 460px;
+  padding: 2.4rem 2.8rem;
+  background: var(--charcoal);
+  border-radius: 16px;
+  box-shadow: var(--panel-shadow);
+  text-align: center;
+}
+
+.world3d__error-card h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  margin: 0 0 1rem;
+}
+
+.world3d__error-card p {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0.6rem 0;
+}
+
+.world3d__error-hint code {
+  color: var(--accent);
+  font-size: 0.9em;
+}

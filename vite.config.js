@@ -1,11 +1,16 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-// Static single-page app. No backend. Builds to dist/ for the public repo.
+// Vite + React app. Vitest shares this config.
+// See spec.md > Stack and spec.md > Where It Runs and How Someone Tries It.
 export default defineConfig({
+  plugins: [react()],
   server: {
-    open: true,
+    port: 5173,
   },
-  build: {
-    target: 'es2022',
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: "./tests/setup.js",
   },
 });
