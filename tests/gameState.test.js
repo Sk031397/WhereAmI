@@ -3,6 +3,7 @@ import {
   initialState,
   isLocked,
   placeGuess,
+  advance,
 } from "../src/lib/gameState.js";
 
 const locations = [
@@ -41,5 +42,30 @@ describe("scoring (slice 3)", () => {
   it("produces a positive distance for a wrong guess", () => {
     const s = placeGuess(initialState(), { lat: 0, lng: 0 }, locations);
     expect(s.distanceKm).toBeGreaterThan(0);
+  });
+});
+
+describe("advance and loop (slice 4)", () => {
+  it("moves to the next location and resets the guess", () => {
+    const guessed = placeGuess(initialState(), { lat: 0, lng: 0 }, locations);
+    const next = advance(guessed, locations);
+    expect(next.currentIndex).toBe(1);
+    expect(next.guess).toBeNull();
+    expect(next.phase).toBe("exploring");
+    expect(next.distanceKm).toBeNull();
+  });
+
+  it("wraps back to the first location after the last", () => {
+    let s = { ...initialState(), currentIndex: locations.length - 1, phase: "revealed" };
+    s = advance(s, locations);
+    expect(s.currentIndex).toBe(0);
+  });
+
+  it("loops cleanly through the whole set and back", () => {
+    let s = initialState();
+    for (let i = 0; i < locations.length; i++) {
+      s = advance(s, locations);
+    }
+    expect(s.currentIndex).toBe(0); // full lap returns to start
   });
 });
