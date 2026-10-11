@@ -103,3 +103,48 @@ body {
 .guessmap__true-marker {
   filter: hue-rotate(130deg) saturate(1.4);
 }
+
+/* Bold scoreboard — punchy result reveal, floating top-center over the 3D world. */
+.scoreboard {
+  position: absolute;
+  top: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1.1rem 2.6rem;
+  background: rgba(26, 21, 18, 0.86);
+  backdrop-filter: blur(6px);
+  border-radius: 16px;
+  box-shadow: var(--panel-shadow);
+  border: 1px solid rgba(232, 200, 154, 0.22);
+  text-align: center;
+  z-index: 600;
+  animation: scoreboard-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.scoreboard__label {
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.scoreboard__distance {
+  font-family: var(--serif);
+  font-size: 3.1rem;
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  margin: 0.15rem 0;
+}
+
+@keyframes scoreboard-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}

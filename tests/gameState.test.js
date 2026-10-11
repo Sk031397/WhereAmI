@@ -29,3 +29,17 @@ describe("guess locking (slice 2)", () => {
     expect(second.guess).toEqual({ lat: 50, lng: 3 });
   });
 });
+
+describe("scoring (slice 3)", () => {
+  it("computes distance to the current location's answer on lock", () => {
+    const s = placeGuess(initialState(), { lat: 48.8584, lng: 2.2945 }, locations);
+    // Guess equals location A's answer, so distance is ~0.
+    expect(s.phase).toBe("revealed");
+    expect(s.distanceKm).toBeCloseTo(0, 3);
+  });
+
+  it("produces a positive distance for a wrong guess", () => {
+    const s = placeGuess(initialState(), { lat: 0, lng: 0 }, locations);
+    expect(s.distanceKm).toBeGreaterThan(0);
+  });
+});
