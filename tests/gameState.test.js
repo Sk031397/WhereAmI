@@ -12,6 +12,7 @@ import {
   roundNumber,
   takeHint,
   hintMultiplier,
+  hintRegion,
   MAX_HINTS,
   matchName,
   guessByName,
@@ -263,5 +264,33 @@ describe("type-to-guess (slice 9)", () => {
     s = takeHint(takeHint(s)); // two hints → ×0.3
     s = guessByName(s, named[s.order[0]].name, named, seededRng(2));
     expect(s.roundPoints).toBe(Math.round(5000 * 0.3));
+  });
+});
+
+describe("map-region hints (slice 10)", () => {
+  const loc = { name: "Eiffel Tower, Paris", answer: { lat: 48.8584, lng: 2.2945 } };
+
+  it("returns no circle with zero hints", () => {
+    expect(hintRegion(loc, 0)).toBeNull();
+  });
+
+  it("shrinks the circle radius as more hints are taken", () => {
+    const r1 = hintRegion(loc, 1).radiusKm;
+    const r2 = hintRegion(loc, 2).radiusKm;
+    expect(r1).toBeGreaterThan(r2);
+  });
+
+  it("keeps the true location inside the circle (offset < radius)", () => {
+    for (const level of [1, 2]) {
+      const { center, radiusKm } = hintRegion(loc, level);
+      const offset = haversineKm(center, loc.answer);
+      expect(offset).toBeLessThan(radiusKm);
+    }
+  });
+
+  it("does not center exactly on the truth (so it hints a region, not the point)", () => {
+    const { center } = hintRegion(loc, 2);
+    const offset = haversineKm(center, loc.answer);
+    expect(offset).toBeGreaterThan(0);
   });
 });

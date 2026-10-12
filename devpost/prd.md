@@ -69,6 +69,7 @@ A single surface and a single loop, so the behavior is described directly rather
 
 - **Take optional hints at a cost.** The player can trade points for help.
   - [ ] During exploring, a Hint button reveals the next of two escalating clues (vague → specific) for the current location.
+  - [ ] Each hint also highlights a region on the minimap as a translucent pulsing circle — broad for hint 1, tighter for hint 2 — centered slightly off the true point so it narrows the search without marking the exact answer.
   - [ ] Each hint taken reduces that round's score via a multiplier (0 hints ×1, 1 hint ×0.6, 2 hints ×0.3).
   - [ ] Hints are available only before the guess locks and reset each round; the AI never uses hints.
 

@@ -15,6 +15,7 @@ import {
   advance,
   resetGame,
   takeHint,
+  hintRegion,
   currentLocationIndex,
   roundNumber,
 } from "./lib/gameState.js";
@@ -90,6 +91,11 @@ export default function App() {
         truth={truth}
         roundPoints={state.roundPoints}
         aiRoundPoints={state.aiRoundPoints}
+        hintRegion={
+          started && state.phase === "exploring"
+            ? hintRegion(current, state.hintsUsed)
+            : null
+        }
         locked={locked || !started}
         onPick={handlePick}
       />

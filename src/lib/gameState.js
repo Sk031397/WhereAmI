@@ -22,6 +22,34 @@ export function hintMultiplier(hintsUsed) {
   return HINT_MULTIPLIERS[i];
 }
 
+// Radius (km) of the minimap region circle for each hint level (index 1 = first
+// hint). Index 0 = no circle. Broad first, tighter second.
+const HINT_RADII_KM = [0, 2500, 700];
+
+// The region circle to highlight on the minimap for the current hint level, or
+// null if no hint has been taken. The circle is centered OFFSET from the true
+// point (deterministically, by ~35% of the radius) so it narrows the search
+// without marking the exact answer — the truth stays inside the circle.
+export function hintRegion(location, hintsUsed) {
+  const level = Math.max(0, Math.min(MAX_HINTS, hintsUsed));
+  if (level === 0) return null;
+  const radiusKm = HINT_RADII_KM[level];
+  const answer = location.answer;
+
+  // Deterministic offset direction from the answer coords (stable per place).
+  const seed = Math.abs(answer.lat * 7.13 + answer.lng * 3.7);
+  const bearing = (seed % (2 * Math.PI));
+  const offsetKm = radiusKm * 0.35;
+  const kmPerDegLat = 111;
+  const kmPerDegLng = 111 * Math.cos((answer.lat * Math.PI) / 180) || 1;
+
+  const center = {
+    lat: answer.lat + (offsetKm * Math.cos(bearing)) / kmPerDegLat,
+    lng: answer.lng + (offsetKm * Math.sin(bearing)) / kmPerDegLng,
+  };
+  return { center, radiusKm };
+}
+
 // Distance → points: MAX_POINTS for a perfect guess, decaying exponentially
 // with distance, floored at 0. Rounded to a whole number.
 export function scoreFromDistanceKm(distanceKm) {

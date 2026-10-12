@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Circle, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { lerpLatLng } from "../lib/distance.js";
@@ -100,6 +100,7 @@ export default function GuessMap({
   truth,
   roundPoints,
   aiRoundPoints,
+  hintRegion,
   locked,
   onPick,
 }) {
@@ -118,6 +119,22 @@ export default function GuessMap({
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <ClickCapture onPick={onPick} locked={locked} />
+
+        {/* Hint region: a translucent pulsing circle narrowing the search while
+            exploring (broad → tighter per hint). Hidden once the result races. */}
+        {!racing && hintRegion && (
+          <Circle
+            center={[hintRegion.center.lat, hintRegion.center.lng]}
+            radius={hintRegion.radiusKm * 1000}
+            pathOptions={{
+              className: "hintcircle",
+              color: "#e8c89a",
+              fillColor: "#e8c89a",
+              fillOpacity: 0.12,
+              weight: 2,
+            }}
+          />
+        )}
 
         {/* Static reference pins during a reveal: where each actually guessed. */}
         {racing && <Marker position={[guess.lat, guess.lng]} icon={pinIcon} />}
