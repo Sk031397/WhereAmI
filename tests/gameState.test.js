@@ -10,6 +10,9 @@ import {
   aiGuessForAnswer,
   currentLocationIndex,
   roundNumber,
+  takeHint,
+  hintMultiplier,
+  MAX_HINTS,
   ROUNDS,
 } from "../src/lib/gameState.js";
 import { haversineKm } from "../src/lib/distance.js";
@@ -155,5 +158,47 @@ describe("rounds, winner, and reset", () => {
     expect(reset.aiTotalScore).toBe(0);
     expect(reset.phase).toBe("exploring");
     expect([...reset.order].sort()).toEqual([0, 1, 2, 3, 4]);
+  });
+});
+
+describe("progressive point-costing hints (slice 8)", () => {
+  it("hintMultiplier returns 1, 0.6, 0.3 for 0/1/2 hints", () => {
+    expect(hintMultiplier(0)).toBe(1);
+    expect(hintMultiplier(1)).toBe(0.6);
+    expect(hintMultiplier(2)).toBe(0.3);
+  });
+
+  it("takeHint increments and caps at MAX_HINTS", () => {
+    let s = initialState(seededRng(1), locations.length);
+    expect(s.hintsUsed).toBe(0);
+    s = takeHint(s);
+    expect(s.hintsUsed).toBe(1);
+    s = takeHint(s);
+    expect(s.hintsUsed).toBe(2);
+    s = takeHint(s); // capped
+    expect(s.hintsUsed).toBe(MAX_HINTS);
+  });
+
+  it("takeHint is a no-op once the guess is locked", () => {
+    let s = initialState(seededRng(1), locations.length);
+    s = placeGuess(s, { lat: 0, lng: 0 }, locations, seededRng(2));
+    const after = takeHint(s);
+    expect(after.hintsUsed).toBe(s.hintsUsed);
+  });
+
+  it("reduces the player's points with hints but NOT the AI's", () => {
+    const answer = locations[currentLocationIndex(initialState(seededRng(1), locations.length))].answer;
+
+    // Perfect guess, no hints.
+    const noHint = placeGuess(initialState(seededRng(1), locations.length), answer, locations, seededRng(5));
+    // Perfect guess, two hints taken first.
+    let withHints = initialState(seededRng(1), locations.length);
+    withHints = takeHint(takeHint(withHints));
+    withHints = placeGuess(withHints, answer, locations, seededRng(5));
+
+    expect(noHint.roundPoints).toBe(5000);
+    expect(withHints.roundPoints).toBe(Math.round(5000 * 0.3)); // 1500
+    // Same rng → identical AI guess, so the AI's points are unaffected by hints.
+    expect(withHints.aiRoundPoints).toBe(noHint.aiRoundPoints);
   });
 });

@@ -1,6 +1,8 @@
 // Hand-picked set of recognizable real locations.
-// See spec.md > Data Model. `name` is internal (NOT shown to the player).
-// `camera` is where the Google 3D view starts; `answer` is the true location for scoring.
+// See spec.md > Data Model. `name` is internal (NOT shown to the player until
+// the reveal). `camera` is where the Google 3D view starts; `answer` is the
+// true location for scoring. `hints` are two escalating clues (vague → specific)
+// surfaced by the point-costing Hint button.
 //
 // NOTE: camera values are hand-tuned starting points to frame each landmark.
 // Altitude/range are in meters. Tune further during the hands-on checkpoint if a
@@ -15,6 +17,7 @@ export const locations = [
       heading: 30,
     },
     answer: { lat: 48.8584, lng: 2.2945 },
+    hints: ["Western Europe", "France"],
   },
   {
     name: "Colosseum, Rome",
@@ -25,6 +28,7 @@ export const locations = [
       heading: 150,
     },
     answer: { lat: 41.8902, lng: 12.4922 },
+    hints: ["Southern Europe, on a peninsula", "Italy"],
   },
   {
     name: "Statue of Liberty, New York",
@@ -35,6 +39,7 @@ export const locations = [
       heading: 200,
     },
     answer: { lat: 40.6892, lng: -74.0445 },
+    hints: ["Eastern coast of North America", "New York City, USA"],
   },
   {
     name: "Sydney Opera House",
@@ -45,6 +50,7 @@ export const locations = [
       heading: 300,
     },
     answer: { lat: -33.8568, lng: 151.2153 },
+    hints: ["Southern Hemisphere, by the coast", "Sydney, Australia"],
   },
   {
     name: "Burj Khalifa, Dubai",
@@ -55,5 +61,6 @@ export const locations = [
       heading: 100,
     },
     answer: { lat: 25.1972, lng: 55.2744 },
+    hints: ["Middle East, on the Persian Gulf", "Dubai, UAE"],
   },
 ];

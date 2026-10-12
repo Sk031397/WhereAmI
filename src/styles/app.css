@@ -238,6 +238,79 @@ body {
   }
 }
 
+/* Floating hint panel — top-left, shown while exploring. */
+.hints {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  width: 240px;
+  padding: 1rem 1.1rem;
+  background: rgba(26, 21, 18, 0.86);
+  backdrop-filter: blur(6px);
+  border-radius: 14px;
+  box-shadow: var(--panel-shadow);
+  border: 1px solid rgba(232, 200, 154, 0.18);
+  z-index: 600;
+}
+
+.hints__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.hints__title {
+  font-family: var(--serif);
+  letter-spacing: 0.06em;
+  color: var(--offwhite);
+}
+
+.hints__score {
+  font-family: var(--sans);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.hints__list {
+  margin: 0 0 0.7rem;
+  padding-left: 1.1rem;
+}
+
+.hints__item {
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--offwhite);
+  margin: 0.25rem 0;
+}
+
+.hints__button {
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.66rem;
+  color: var(--espresso);
+  background: var(--accent);
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.hints__button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.hints__button:disabled {
+  background: rgba(185, 174, 159, 0.3);
+  color: var(--muted);
+  cursor: default;
+}
+
 /* Glowing neon orb avatars (You / AI) — thumbnail-inspired identity markers. */
 .orb {
   --orb-color: var(--accent);

@@ -60,6 +60,11 @@ A single surface and a single loop, so the behavior is described directly rather
   - [ ] After the 5th round's reveal, a final tally screen shows both totals and declares the winner (you or the AI; ties handled).
   - [ ] A play-again action reshuffles the order, resets both totals, and returns to round 1.
 
+- **Take optional hints at a cost.** The player can trade points for help.
+  - [ ] During exploring, a Hint button reveals the next of two escalating clues (vague → specific) for the current location.
+  - [ ] Each hint taken reduces that round's score via a multiplier (0 hints ×1, 1 hint ×0.6, 2 hints ×0.3).
+  - [ ] Hints are available only before the guess locks and reset each round; the AI never uses hints.
+
 - **Auto-advance between rounds.** After each of the first four reveals, the game continues on its own.
   - [ ] The result lingers for ~5 seconds before advancing.
   - [ ] The 3D view remains interactive (flyable) during the reveal.
@@ -81,6 +86,7 @@ A single surface and a single loop, so the behavior is described directly rather
 - **Running total over a fixed 5 rounds, then a tally** — the player chose to pull running score + final tally from Later into the POC, replacing the infinite loop with a 5-round game and a play-again reset.
 - **Randomized round order** — the player chose to shuffle the hand-picked locations each game so replays differ.
 - **Simulated AI opponent** — the player chose a head-to-head competitor. It is an honest scripted bot: each round it guesses a point offset from the true location by a randomized error (an adjustable skill), then scores by the same rules. It is explicitly NOT a vision model that recognizes the rendered 3D scene — that is deferred.
+- **Progressive point-costing hints** — the player chose option 1: two escalating clues per location, each taken multiplying that round's score down (×1 / ×0.6 / ×0.3). A multiplier (not a flat subtraction) keeps the cost proportional. Preserves the recognition kernel by making help a tradeoff, not a giveaway; the AI never uses hints, so hints are purely the player's strategic lever against it.
 - **True location revealed on the map** — alongside the distance, the real spot is shown next to the player's pin, for the "that's where I actually was" payoff.
 - **Instant pin lock, no confirm** — the player chose for the pin to lock on drop. Tradeoff acknowledged: a misclick ends the round, which raises the stakes and makes the reveal the whole payoff.
 - **Auto-advance with ~5-second linger** — the player chose auto-advance, held long enough (~5s) for the reveal to land; the 3D world stays live during it to keep immersion unbroken.

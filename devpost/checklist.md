@@ -79,6 +79,16 @@ Build mode: fast
   Learner check: Play a round; confirm the gold YOU and cyan AI orbs glow on the scoreboard, and that on reveal you can see your pin, the AI's pin, and the true spot distinctly on the map.
   Commit: `Add glowing You/AI identity orbs and colored guess markers`
 
+- [x] **8. Progressive point-costing hints**
+  Becomes usable: During exploring, a Hint button reveals the next of two escalating clues for the current place; each hint taken multiplies that round's score down (×1 / ×0.6 / ×0.3). The AI is unaffected, so hints are the player's strategic tradeoff against it.
+  Why now: Scope change — the player added hints (option 1: progressive, point-costing) for a better chance at guessing without giving away the answer. Builds on the slice 5 scoring and slice 6 AI.
+  PRD ref: `prd.md > Features and Behavior > Take optional hints at a cost`, `prd.md > Product Decisions`
+  Spec ref: `spec.md > Components > App`, `spec.md > Components > Scoreboard`, `spec.md > Data Model`
+  Build: Add two escalating `hints` strings per location in `data/locations.js`. In `lib/gameState.js` add `hintsUsed` (init 0, reset each round), `takeHint(state)` (increments to a cap of 2, only while exploring), and `hintMultiplier(hintsUsed)` → 1 / 0.6 / 0.3. `placeGuess` multiplies the PLAYER's `roundPoints` by the hint multiplier — the AI's score is untouched. Add a Hint UI (button + revealed clues) shown during exploring, disabled at 2 hints; wire `App` to pass the current location's hints and a `handleHint`.
+  Verify (mechanical): Unit tests — `takeHint` increments and caps at 2, is a no-op once locked, `hintMultiplier` returns 1/0.6/0.3, and `placeGuess` reduces the player's points with hints while the AI's points are unchanged. `npm.cmd test` passes; `npm.cmd run build` compiles.
+  Learner check: Take 0, 1, then 2 hints across rounds; confirm the clues escalate, the button disables at 2, and more hints visibly lower your round score while the AI's isn't affected.
+  Commit: `Add progressive point-costing hints`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 1. Learner has no Google Maps API key yet, so live 3D-tile rendering is deferred to the final review; build verified via compile + clean dev-server boot, and the no-key fallback card confirmed. No look/camera change requested.

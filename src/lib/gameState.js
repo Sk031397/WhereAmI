@@ -12,6 +12,16 @@ const HALF_LIFE_KM = 2000;
 // Simulated AI opponent "skill": typical guess error in km. Larger = weaker AI.
 export const AI_ERROR_KM = 600;
 
+// Score multiplier by number of hints taken this round (index = hintsUsed).
+// 0 hints = full points; each hint costs proportionally.
+export const HINT_MULTIPLIERS = [1, 0.6, 0.3];
+export const MAX_HINTS = HINT_MULTIPLIERS.length - 1; // 2
+
+export function hintMultiplier(hintsUsed) {
+  const i = Math.max(0, Math.min(MAX_HINTS, hintsUsed));
+  return HINT_MULTIPLIERS[i];
+}
+
 // Distance → points: MAX_POINTS for a perfect guess, decaying exponentially
 // with distance, floored at 0. Rounded to a whole number.
 export function scoreFromDistanceKm(distanceKm) {
@@ -68,6 +78,7 @@ export function initialState(rng = Math.random, locationCount = ROUNDS) {
     distanceKm: null,
     roundPoints: null,
     totalScore: 0,
+    hintsUsed: 0,
     aiGuess: null,
     aiRoundPoints: null,
     aiTotalScore: 0,
@@ -79,14 +90,24 @@ export function isLocked(state) {
   return state.phase !== "exploring";
 }
 
-// Place and lock the player's pin, score it, AND resolve the AI opponent's
-// guess for the same location — both add to their running totals.
+// Reveal the next hint for the current round. No-op once the guess is locked
+// or once the max number of hints has been taken.
+export function takeHint(state) {
+  if (isLocked(state)) return state;
+  if (state.hintsUsed >= MAX_HINTS) return state;
+  return { ...state, hintsUsed: state.hintsUsed + 1 };
+}
+
+// Place and lock the player's pin, score it (reduced by any hints taken), AND
+// resolve the AI opponent's guess for the same location. The hint multiplier
+// applies ONLY to the player — the AI never uses hints.
 export function placeGuess(state, latlng, locations, rng = Math.random) {
   if (isLocked(state)) return state;
   const answer = locations[currentLocationIndex(state)].answer;
 
   const distanceKm = haversineKm(latlng, answer);
-  const roundPoints = scoreFromDistanceKm(distanceKm);
+  const rawPoints = scoreFromDistanceKm(distanceKm);
+  const roundPoints = Math.round(rawPoints * hintMultiplier(state.hintsUsed));
 
   const aiGuess = aiGuessForAnswer(answer, AI_ERROR_KM, rng);
   const aiRoundPoints = scoreFromDistanceKm(haversineKm(aiGuess, answer));
@@ -126,6 +147,7 @@ export function advance(state) {
     phase: "exploring",
     distanceKm: null,
     roundPoints: null,
+    hintsUsed: 0,
     aiGuess: null,
     aiRoundPoints: null,
     // totals preserved across rounds.

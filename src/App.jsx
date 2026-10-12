@@ -3,6 +3,7 @@ import World3D from "./components/World3D.jsx";
 import GuessMap from "./components/GuessMap.jsx";
 import Scoreboard from "./components/Scoreboard.jsx";
 import FinalTally from "./components/FinalTally.jsx";
+import HintPanel from "./components/HintPanel.jsx";
 import { locations } from "./data/locations.js";
 import {
   initialState,
@@ -10,6 +11,7 @@ import {
   placeGuess,
   advance,
   resetGame,
+  takeHint,
   currentLocationIndex,
   roundNumber,
 } from "./lib/gameState.js";
@@ -34,6 +36,10 @@ export default function App() {
     setState(resetGame(undefined, locations.length));
   }
 
+  function handleHint() {
+    setState((s) => takeHint(s));
+  }
+
   // Once a result is revealed, hold ~5s then advance. On the final round,
   // advance() switches to the "finished" phase (tally) instead of continuing.
   useEffect(() => {
@@ -47,6 +53,13 @@ export default function App() {
   return (
     <div className="app">
       <World3D camera={current.camera} />
+      {state.phase === "exploring" && (
+        <HintPanel
+          hints={current.hints}
+          hintsUsed={state.hintsUsed}
+          onHint={handleHint}
+        />
+      )}
       <Scoreboard
         phase={state.phase}
         round={roundNumber(state)}
