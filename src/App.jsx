@@ -60,6 +60,8 @@ export default function App() {
         guess={state.guess}
         aiGuess={state.phase === "revealed" ? state.aiGuess : null}
         truth={truth}
+        roundPoints={state.roundPoints}
+        aiRoundPoints={state.aiRoundPoints}
         locked={locked}
         onPick={handlePick}
       />

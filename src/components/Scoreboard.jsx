@@ -1,6 +1,5 @@
 import { ROUNDS } from "../lib/gameState.js";
 import PlayerOrb from "./PlayerOrb.jsx";
-import OrbRace from "./OrbRace.jsx";
 
 // The bold scoreboard overlay — punchy result reveal in cinematic-luxury style.
 // Shows the player vs the simulated AI opponent with glowing identity orbs.
@@ -33,9 +32,7 @@ export default function Scoreboard({
       </div>
 
       {revealed && (
-        <>
-          <OrbRace roundPoints={roundPoints} aiRoundPoints={aiRoundPoints} />
-          <div className="scoreboard__reveal">
+        <div className="scoreboard__reveal">
             <div className="scoreboard__side">
               <PlayerOrb name="You" variant="gold" size="sm" />
               <div className="scoreboard__points">+{roundPoints.toLocaleString()}</div>
@@ -49,7 +46,6 @@ export default function Scoreboard({
               </div>
             </div>
           </div>
-        </>
       )}
 
       <div className="scoreboard__total">

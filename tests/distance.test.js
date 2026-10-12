@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { haversineKm } from "../src/lib/distance.js";
+import { haversineKm, lerpLatLng } from "../src/lib/distance.js";
 
 describe("haversineKm (slice 3)", () => {
   it("is zero for identical points", () => {
@@ -27,5 +27,24 @@ describe("haversineKm (slice 3)", () => {
     const a = { lat: 10, lng: 20 };
     const b = { lat: -30, lng: 100 };
     expect(haversineKm(a, b)).toBeCloseTo(haversineKm(b, a), 6);
+  });
+});
+
+describe("lerpLatLng (map race)", () => {
+  const a = { lat: 0, lng: 0 };
+  const b = { lat: 10, lng: 20 };
+
+  it("returns the start at t=0 and the end at t=1", () => {
+    expect(lerpLatLng(a, b, 0)).toEqual({ lat: 0, lng: 0 });
+    expect(lerpLatLng(a, b, 1)).toEqual({ lat: 10, lng: 20 });
+  });
+
+  it("returns the midpoint at t=0.5", () => {
+    expect(lerpLatLng(a, b, 0.5)).toEqual({ lat: 5, lng: 10 });
+  });
+
+  it("clamps t outside [0,1]", () => {
+    expect(lerpLatLng(a, b, -1)).toEqual({ lat: 0, lng: 0 });
+    expect(lerpLatLng(a, b, 2)).toEqual({ lat: 10, lng: 20 });
   });
 });

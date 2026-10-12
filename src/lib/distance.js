@@ -20,3 +20,13 @@ export function haversineKm(a, b) {
 
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
 }
+
+// Linear interpolation between two {lat, lng} points. `t` in [0,1]:
+// t=0 → a, t=1 → b. Used to animate an orb a fraction of the way to the truth.
+export function lerpLatLng(a, b, t) {
+  const clamped = Math.max(0, Math.min(1, t));
+  return {
+    lat: a.lat + (b.lat - a.lat) * clamped,
+    lng: a.lng + (b.lng - a.lng) * clamped,
+  };
+}
