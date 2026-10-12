@@ -101,6 +101,16 @@ describe("simulated AI opponent", () => {
     expect(s.aiRoundPoints).toBeGreaterThanOrEqual(0);
     expect(s.aiTotalScore).toBe(s.aiRoundPoints);
   });
+
+  it("exposes the AI's guess latlng so it can be drawn on the map", () => {
+    const s0 = initialState(seededRng(1), locations.length);
+    const answer = locations[currentLocationIndex(s0)].answer;
+    const s = placeGuess(s0, answer, locations, seededRng(5));
+    expect(s.aiGuess).toHaveProperty("lat");
+    expect(s.aiGuess).toHaveProperty("lng");
+    expect(Number.isFinite(s.aiGuess.lat)).toBe(true);
+    expect(Number.isFinite(s.aiGuess.lng)).toBe(true);
+  });
 });
 
 describe("rounds, winner, and reset", () => {

@@ -58,6 +58,7 @@ export default function App() {
       />
       <GuessMap
         guess={state.guess}
+        aiGuess={state.phase === "revealed" ? state.aiGuess : null}
         truth={truth}
         locked={locked}
         onPick={handlePick}

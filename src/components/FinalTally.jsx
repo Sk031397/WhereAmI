@@ -1,6 +1,7 @@
 import { ROUNDS } from "../lib/gameState.js";
+import PlayerOrb from "./PlayerOrb.jsx";
 
-// Final tally screen: player vs AI totals and the winner.
+// Final tally screen: player vs AI totals (as glowing orbs) and the winner.
 // Implements prd.md > Features and Behavior > Play five rounds against an AI.
 export default function FinalTally({ totalScore, aiTotalScore, winner, onPlayAgain }) {
   const headline =
@@ -13,16 +14,9 @@ export default function FinalTally({ totalScore, aiTotalScore, winner, onPlayAga
         <div className={`tally__headline tally__headline--${winner}`}>{headline}</div>
 
         <div className="tally__scores">
-          <div className="tally__scoreside">
-            <div className="tally__label">You</div>
-            <div className="tally__score">{totalScore.toLocaleString()}</div>
-          </div>
-          <div className="tally__scoreside">
-            <div className="tally__label">AI</div>
-            <div className="tally__score tally__score--ai">
-              {aiTotalScore.toLocaleString()}
-            </div>
-          </div>
+          <PlayerOrb name="You" variant="gold" size="md" points={totalScore} />
+          <div className="tally__vs">vs</div>
+          <PlayerOrb name="AI" variant="cyan" size="md" points={aiTotalScore} />
         </div>
 
         <button className="tally__button" onClick={onPlayAgain}>

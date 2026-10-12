@@ -2,24 +2,20 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix Leaflet's default marker icon paths under a bundler (Vite).
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
+// Glowing dot markers that match the orb identities. Pure CSS via DivIcon,
+// so no image assets are needed and the colors stay in sync with the orbs.
+function dotIcon(colorClass) {
+  return L.divIcon({
+    className: "", // avoid Leaflet's default styling
+    html: `<span class="mapdot mapdot--${colorClass}"></span>`,
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
+  });
+}
 
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
-// A distinct icon for the revealed true location (slice 3+).
-const trueIcon = new L.Icon({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-  className: "guessmap__true-marker",
-});
+const playerIcon = dotIcon("gold"); // You
+const aiIcon = dotIcon("cyan"); // AI opponent
+const truthIcon = dotIcon("truth"); // true location
 
 // Captures a single map click and reports it up, only while unlocked.
 function ClickCapture({ onPick, locked }) {
@@ -34,8 +30,8 @@ function ClickCapture({ onPick, locked }) {
 
 // The always-visible corner guess map.
 // Implements spec.md > Components > GuessMap and
-// prd.md > Features and Behavior > Drop a pin to guess.
-export default function GuessMap({ guess, truth, locked, onPick }) {
+// prd.md > Features and Behavior > Drop a pin to guess + Play five rounds against an AI.
+export default function GuessMap({ guess, aiGuess, truth, locked, onPick }) {
   return (
     <div className="guessmap" aria-label="Guess map — click to drop your pin">
       <MapContainer
@@ -49,8 +45,9 @@ export default function GuessMap({ guess, truth, locked, onPick }) {
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <ClickCapture onPick={onPick} locked={locked} />
-        {guess && <Marker position={[guess.lat, guess.lng]} />}
-        {truth && <Marker position={[truth.lat, truth.lng]} icon={trueIcon} />}
+        {guess && <Marker position={[guess.lat, guess.lng]} icon={playerIcon} />}
+        {aiGuess && <Marker position={[aiGuess.lat, aiGuess.lng]} icon={aiIcon} />}
+        {truth && <Marker position={[truth.lat, truth.lng]} icon={truthIcon} />}
       </MapContainer>
     </div>
   );

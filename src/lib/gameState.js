@@ -68,6 +68,7 @@ export function initialState(rng = Math.random, locationCount = ROUNDS) {
     distanceKm: null,
     roundPoints: null,
     totalScore: 0,
+    aiGuess: null,
     aiRoundPoints: null,
     aiTotalScore: 0,
     winner: null, // "you" | "ai" | "tie" (set when finished)
@@ -97,6 +98,7 @@ export function placeGuess(state, latlng, locations, rng = Math.random) {
     distanceKm,
     roundPoints,
     totalScore: state.totalScore + roundPoints,
+    aiGuess,
     aiRoundPoints,
     aiTotalScore: state.aiTotalScore + aiRoundPoints,
   };
@@ -124,6 +126,7 @@ export function advance(state) {
     phase: "exploring",
     distanceKm: null,
     roundPoints: null,
+    aiGuess: null,
     aiRoundPoints: null,
     // totals preserved across rounds.
   };

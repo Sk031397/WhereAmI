@@ -1,7 +1,8 @@
 import { ROUNDS } from "../lib/gameState.js";
+import PlayerOrb from "./PlayerOrb.jsx";
 
 // The bold scoreboard overlay — punchy result reveal in cinematic-luxury style.
-// Shows the player vs the simulated AI opponent.
+// Shows the player vs the simulated AI opponent with glowing identity orbs.
 // Implements spec.md > Components > Scoreboard and
 // prd.md > Features and Behavior > Play five rounds against an AI.
 export default function Scoreboard({
@@ -33,13 +34,13 @@ export default function Scoreboard({
       {revealed && (
         <div className="scoreboard__reveal">
           <div className="scoreboard__side">
-            <div className="scoreboard__side-label">You</div>
+            <PlayerOrb name="You" variant="gold" size="sm" />
             <div className="scoreboard__points">+{roundPoints.toLocaleString()}</div>
             <div className="scoreboard__distance-sub">{distanceText} off</div>
           </div>
           <div className="scoreboard__vs">vs</div>
           <div className="scoreboard__side">
-            <div className="scoreboard__side-label">AI</div>
+            <PlayerOrb name="AI" variant="cyan" size="sm" />
             <div className="scoreboard__points scoreboard__points--ai">
               +{(aiRoundPoints ?? 0).toLocaleString()}
             </div>
@@ -53,3 +54,4 @@ export default function Scoreboard({
     </div>
   );
 }
+

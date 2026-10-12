@@ -99,9 +99,28 @@ body {
   width: 100%;
 }
 
-/* Tint the revealed true-location marker so it reads apart from the guess pin. */
-.guessmap__true-marker {
-  filter: hue-rotate(130deg) saturate(1.4);
+/* Glowing dot markers on the guess map — colors match the player orbs. */
+.mapdot {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+}
+
+.mapdot--gold {
+  background: #f5c876;
+  box-shadow: 0 0 8px 2px rgba(245, 200, 118, 0.9);
+}
+
+.mapdot--cyan {
+  background: #4fd6e8;
+  box-shadow: 0 0 8px 2px rgba(79, 214, 232, 0.9);
+}
+
+.mapdot--truth {
+  background: #ffffff;
+  box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.85);
 }
 
 /* Bold scoreboard — punchy result reveal, floating top-center over the 3D world. */
@@ -197,6 +216,114 @@ body {
   }
 }
 
+/* Glowing neon orb avatars (You / AI) — thumbnail-inspired identity markers. */
+.orb {
+  --orb-color: var(--accent);
+  --orb-glow: rgba(232, 200, 154, 0.75);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.orb--gold {
+  --orb-color: #f5c876;
+  --orb-glow: rgba(245, 200, 118, 0.8);
+}
+
+.orb--cyan {
+  --orb-color: #4fd6e8;
+  --orb-glow: rgba(79, 214, 232, 0.8);
+}
+
+.orb__ball {
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--orb-color) 55%, var(--orb-color));
+  box-shadow:
+    0 0 10px 2px var(--orb-glow),
+    0 0 26px 6px var(--orb-glow),
+    0 0 48px 12px var(--orb-glow);
+  animation: orb-pulse 2.4s ease-in-out infinite;
+}
+
+.orb--md .orb__ball {
+  width: 52px;
+  height: 52px;
+}
+
+.orb--sm .orb__ball {
+  width: 34px;
+  height: 34px;
+}
+
+/* Comet trail: three fading dots leading up to the orb. */
+.orb__trail {
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 6px;
+  transform: translateY(-60%);
+}
+
+.orb__trail span {
+  display: block;
+  border-radius: 50%;
+  background: var(--orb-color);
+  box-shadow: 0 0 8px 2px var(--orb-glow);
+}
+
+.orb__trail span:nth-child(1) {
+  width: 5px;
+  height: 5px;
+  opacity: 0.35;
+}
+.orb__trail span:nth-child(2) {
+  width: 7px;
+  height: 7px;
+  opacity: 0.55;
+}
+.orb__trail span:nth-child(3) {
+  width: 10px;
+  height: 10px;
+  opacity: 0.8;
+}
+
+.orb__label {
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.62rem;
+  color: var(--orb-color);
+  text-shadow: 0 0 8px var(--orb-glow);
+}
+
+.orb__points {
+  font-family: var(--serif);
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--orb-color);
+  text-shadow: 0 0 10px var(--orb-glow);
+}
+
+@keyframes orb-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 10px 2px var(--orb-glow),
+      0 0 26px 6px var(--orb-glow),
+      0 0 48px 12px var(--orb-glow);
+  }
+  50% {
+    box-shadow:
+      0 0 12px 3px var(--orb-glow),
+      0 0 34px 9px var(--orb-glow),
+      0 0 60px 16px var(--orb-glow);
+  }
+}
+
 /* Final tally screen — a centered cinematic card over a dimmed world. */
 .tally {
   position: absolute;
@@ -260,10 +387,15 @@ body {
   display: flex;
   gap: 2.4rem;
   justify-content: center;
+  align-items: center;
+  margin: 0.4rem 0 0.6rem;
 }
 
-.tally__scoreside {
-  min-width: 110px;
+.tally__vs {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--muted);
+  font-size: 1.1rem;
 }
 
 .tally__button {

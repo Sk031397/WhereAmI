@@ -69,6 +69,16 @@ Build mode: fast
   Learner check: Play a full game; confirm the order varies between games, the AI's score shows each round and in the tally, and the winner is declared correctly.
   Commit: `Add randomized order and simulated AI opponent`
 
+- [x] **7. Glowing identity orbs (You/AI) and colored guess markers on the map**
+  Becomes usable: The scoreboard and final tally show thumbnail-style glowing neon orb avatars — gold "YOU" and cyan "AI" — each with a soft glow and comet-trail. On the reveal, the map shows the player's guess (gold), the AI's guess (cyan, newly drawn), and the true location, each visually distinct.
+  Why now: Visual-identity polish the player requested (reference: a neon-orb multiplayer thumbnail). Also closes a real gap — the AI's guess is scored but was never shown on the map. Pure presentation; game logic unchanged.
+  PRD ref: `prd.md > Look and Feel`, `prd.md > Features and Behavior > Play five rounds against an AI`
+  Spec ref: `spec.md > Look and Feel`, `spec.md > Components > Scoreboard`, `spec.md > Components > GuessMap`
+  Build: Add a pure-CSS `PlayerOrb` component (glowing radial-gradient circle + comet-trail dots + name label), gold and cyan variants. Use it in `Scoreboard` and `FinalTally` for the You/AI sides. Expose the AI's guess latlng in game state (`aiGuess`) so it can be drawn. Update `GuessMap` to render three distinct markers on reveal: player guess (gold), AI guess (cyan), true location.
+  Verify (mechanical): `npm.cmd run build` compiles; `npm.cmd test` still passes (logic unchanged, plus a small assertion that `placeGuess` exposes `aiGuess`). Confirm the AI-guess marker and orbs render in the running app.
+  Learner check: Play a round; confirm the gold YOU and cyan AI orbs glow on the scoreboard, and that on reveal you can see your pin, the AI's pin, and the true spot distinctly on the map.
+  Commit: `Add glowing You/AI identity orbs and colored guess markers`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 1. Learner has no Google Maps API key yet, so live 3D-tile rendering is deferred to the final review; build verified via compile + clean dev-server boot, and the no-key fallback card confirmed. No look/camera change requested.
