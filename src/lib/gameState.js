@@ -98,6 +98,62 @@ export function takeHint(state) {
   return { ...state, hintsUsed: state.hintsUsed + 1 };
 }
 
+// Normalize a string for fuzzy name matching: lowercase, strip punctuation,
+// collapse whitespace into single-space-separated tokens.
+function normalizeTokens(str) {
+  return String(str)
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+// Common words to ignore so "paris" matches "Eiffel Tower, Paris" without the
+// filler tokens causing noise.
+const STOP = new Set(["the", "of", "at", "in", "on", "tower", "city"]);
+
+// Fuzzy name match: does the typed input name the given location? True if any
+// meaningful token of the input matches any meaningful token of the location
+// name (so "paris", "eiffel", or "eiffel tower paris" all match
+// "Eiffel Tower, Paris"). Case- and punctuation-insensitive.
+export function matchName(input, location) {
+  const inputTokens = normalizeTokens(input).filter((t) => !STOP.has(t));
+  if (inputTokens.length === 0) return false;
+  const nameTokens = new Set(normalizeTokens(location.name).filter((t) => !STOP.has(t)));
+  return inputTokens.some((t) => nameTokens.has(t));
+}
+
+// Guess by typing a place name. A correct name is scored as a perfect pin on
+// the true location (full distance points × hint multiplier); a wrong or empty
+// name locks the round with zero player points. The AI still guesses either way.
+export function guessByName(state, input, locations, rng = Math.random) {
+  if (isLocked(state)) return state;
+  const location = locations[currentLocationIndex(state)];
+  const answer = location.answer;
+  const correct = matchName(input, location);
+
+  const roundPoints = correct
+    ? Math.round(scoreFromDistanceKm(0) * hintMultiplier(state.hintsUsed))
+    : 0;
+
+  const aiGuess = aiGuessForAnswer(answer, AI_ERROR_KM, rng);
+  const aiRoundPoints = scoreFromDistanceKm(haversineKm(aiGuess, answer));
+
+  return {
+    ...state,
+    // On a correct name, snap the guess to the truth so the map/race read right.
+    // On a wrong name, there is no player pin.
+    guess: correct ? { ...answer } : null,
+    phase: "revealed",
+    distanceKm: correct ? 0 : null,
+    roundPoints,
+    totalScore: state.totalScore + roundPoints,
+    aiGuess,
+    aiRoundPoints,
+    aiTotalScore: state.aiTotalScore + aiRoundPoints,
+  };
+}
+
 // Place and lock the player's pin, score it (reduced by any hints taken), AND
 // resolve the AI opponent's guess for the same location. The hint multiplier
 // applies ONLY to the player — the AI never uses hints.

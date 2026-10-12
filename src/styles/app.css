@@ -121,6 +121,71 @@ body {
 .mapdot--truth {
   background: #ffffff;
   box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.85);
+  /* Reveal-time pulse: the truth marker only appears at the reveal, so it can
+     always pulse to make the correct spot unmistakable. */
+  animation: truth-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes truth-pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.85);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px 8px rgba(255, 255, 255, 0.95);
+    transform: scale(1.35);
+  }
+}
+
+/* Type-to-guess input — bottom-center, an alternative to clicking the map. */
+.typeguess {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 600;
+}
+
+.typeguess__input {
+  width: 260px;
+  padding: 0.7rem 1rem;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  color: var(--offwhite);
+  background: rgba(26, 21, 18, 0.86);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(232, 200, 154, 0.25);
+  border-radius: 10px;
+  outline: none;
+}
+
+.typeguess__input::placeholder {
+  color: var(--muted);
+}
+
+.typeguess__input:focus {
+  border-color: var(--accent);
+}
+
+.typeguess__button {
+  padding: 0.7rem 1.4rem;
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--espresso);
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.typeguess__button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
 }
 
 /* Faint static marker for where each side actually guessed, during the race. */

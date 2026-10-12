@@ -46,11 +46,18 @@ A single surface and a single loop, so the behavior is described directly rather
   - [ ] Clicking the map places a pin at that spot.
   - [ ] The pin locks on the first placement — the guess is committed instantly, with no confirm and no second attempt that round.
 
+- **Or type the place name to guess.** An alternative input, with the minimap still available.
+  - [ ] A text box during exploring accepts a typed place name; submitting locks the guess.
+  - [ ] A correct name (fuzzy, case/punctuation-insensitive, matches a key part like "paris" or "eiffel") is scored as if the player pinned the true location (full distance points, minus any hint penalty).
+  - [ ] A wrong or unrecognized typed name scores zero for that round.
+  - [ ] Clicking the map or submitting a name — whichever happens first — locks the round; the other is then disabled.
+
 - **See how close you were.** Immediately after the pin locks, the result reveals.
   - [ ] A distance number is shown (how far the guess was from the true location, e.g. "180 km off").
   - [ ] The guess is converted to points (closer = more points) and shown alongside the distance.
   - [ ] A running total of points so far is shown.
   - [ ] The true location appears on the map alongside the player's pin.
+  - [ ] At the reveal (and only then), the true-location marker pulses/glows so it's unmistakable.
   - [ ] The reveal is presented with bold, scoreboard-style emphasis.
 
 - **Play five rounds against an AI, then see who won.** The game has a fixed length and an opponent.

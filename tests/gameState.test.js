@@ -13,6 +13,8 @@ import {
   takeHint,
   hintMultiplier,
   MAX_HINTS,
+  matchName,
+  guessByName,
   ROUNDS,
 } from "../src/lib/gameState.js";
 import { haversineKm } from "../src/lib/distance.js";
@@ -200,5 +202,54 @@ describe("progressive point-costing hints (slice 8)", () => {
     expect(withHints.roundPoints).toBe(Math.round(5000 * 0.3)); // 1500
     // Same rng → identical AI guess, so the AI's points are unaffected by hints.
     expect(withHints.aiRoundPoints).toBe(noHint.aiRoundPoints);
+  });
+});
+
+describe("type-to-guess (slice 9)", () => {
+  const named = [
+    { name: "Eiffel Tower, Paris", answer: { lat: 48.8584, lng: 2.2945 } },
+    { name: "Colosseum, Rome", answer: { lat: 41.8902, lng: 12.4922 } },
+  ];
+
+  it("matchName accepts case/punctuation/partial variants", () => {
+    const loc = named[0];
+    expect(matchName("paris", loc)).toBe(true);
+    expect(matchName("PARIS", loc)).toBe(true);
+    expect(matchName("eiffel", loc)).toBe(true);
+    expect(matchName("Eiffel Tower, Paris", loc)).toBe(true);
+    expect(matchName("  paris!! ", loc)).toBe(true);
+  });
+
+  it("matchName rejects wrong or empty names", () => {
+    const loc = named[0];
+    expect(matchName("london", loc)).toBe(false);
+    expect(matchName("", loc)).toBe(false);
+    expect(matchName("   ", loc)).toBe(false);
+  });
+
+  it("guessByName gives full points (snapped to truth) on a correct name", () => {
+    const s0 = initialState(seededRng(1), named.length);
+    const currentName = named[s0.order[0]].name;
+    const s = guessByName(s0, currentName, named, seededRng(2));
+    expect(s.phase).toBe("revealed");
+    expect(s.roundPoints).toBeGreaterThan(0);
+    expect(s.distanceKm).toBe(0);
+    expect(s.guess).not.toBeNull();
+  });
+
+  it("guessByName scores zero and sets no pin on a wrong name", () => {
+    const s = guessByName(initialState(seededRng(1), named.length), "atlantis", named, seededRng(2));
+    expect(s.phase).toBe("revealed");
+    expect(s.roundPoints).toBe(0);
+    expect(s.guess).toBeNull();
+    // The AI still guesses regardless.
+    expect(s.aiRoundPoints).toBeGreaterThanOrEqual(0);
+  });
+
+  it("applies the hint penalty to a correct typed guess", () => {
+    let s = initialState(seededRng(1), named.length);
+    s = takeHint(takeHint(s)); // two hints → ×0.3
+    s = guessByName(s, named[s.order[0]].name, named, seededRng(2));
+    expect(s.roundPoints).toBe(Math.round(5000 * 0.3));
   });
 });

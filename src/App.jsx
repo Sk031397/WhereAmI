@@ -4,11 +4,13 @@ import GuessMap from "./components/GuessMap.jsx";
 import Scoreboard from "./components/Scoreboard.jsx";
 import FinalTally from "./components/FinalTally.jsx";
 import HintPanel from "./components/HintPanel.jsx";
+import TypeGuess from "./components/TypeGuess.jsx";
 import { locations } from "./data/locations.js";
 import {
   initialState,
   isLocked,
   placeGuess,
+  guessByName,
   advance,
   resetGame,
   takeHint,
@@ -40,6 +42,10 @@ export default function App() {
     setState((s) => takeHint(s));
   }
 
+  function handleTypeGuess(text) {
+    setState((s) => guessByName(s, text, locations));
+  }
+
   // Once a result is revealed, hold ~5s then advance. On the final round,
   // advance() switches to the "finished" phase (tally) instead of continuing.
   useEffect(() => {
@@ -60,6 +66,7 @@ export default function App() {
           onHint={handleHint}
         />
       )}
+      {state.phase === "exploring" && <TypeGuess onSubmit={handleTypeGuess} />}
       <Scoreboard
         phase={state.phase}
         round={roundNumber(state)}

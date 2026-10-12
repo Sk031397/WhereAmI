@@ -38,6 +38,8 @@ In scope — the minimum to prove the recognition kernel and the guess loop:
 - Randomized round order each game (shuffled from the hand-picked set).
 - A simulated AI opponent that guesses each round with an adjustable skill/error, scores by the same rules, and competes head-to-head for a win/lose outcome. (Honest scripted bot — NOT a vision model that "sees" the 3D scene.)
 - Optional progressive hints: each location has two escalating clues; taking a hint reduces that round's score (multiplier), preserving the recognition challenge. The AI never uses hints.
+- Two ways to guess: click the corner map (distance-based), or type the place name (correct fuzzy match = full points as if pinned on the truth, wrong = zero that round). The minimap remains.
+- A reveal-time pulsing glow on the true-location marker (shown only after the guess locks).
 
 ## Later
 - Larger / randomized pool of locations.

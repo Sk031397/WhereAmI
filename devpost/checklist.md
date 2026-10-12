@@ -89,6 +89,16 @@ Build mode: fast
   Learner check: Take 0, 1, then 2 hints across rounds; confirm the clues escalate, the button disables at 2, and more hints visibly lower your round score while the AI's isn't affected.
   Commit: `Add progressive point-costing hints`
 
+- [x] **9. Type-to-guess alternative input and a reveal-time pulse**
+  Becomes usable: Alongside the corner map, a text box lets the player type the place name as their guess; a correct fuzzy match scores as if pinned on the truth (full points, minus hint penalty), a wrong name scores zero. Whichever of click/type happens first locks the round. On the reveal, the true-location marker pulses/glows so it's unmistakable.
+  Why now: Scope change — the player wanted an alternative to map-clicking (keeping the minimap) plus a clearer answer reveal. Builds on slice 5 scoring and slice 8 hints.
+  PRD ref: `prd.md > Features and Behavior > Or type the place name to guess`, `prd.md > Features and Behavior > See how close you were` (reveal pulse)
+  Spec ref: `spec.md > Components > App`, `spec.md > Components > GuessMap`, `spec.md > Data Model`
+  Build: In `lib/gameState.js` add `matchName(input, location)` (lowercase, strip punctuation, match input tokens against the location's name tokens) and `guessByName(state, input, locations, rng)` — on a match, behave like a perfect pin (guess = true answer, full distance points × hint multiplier); on no match, lock with zero round points and no player pin. The AI still guesses. Keep `placeGuess` for map clicks. Add a `TypeGuess` input shown during exploring; wire `App` with a submit handler. Add a reveal-time pulse animation to the true-location marker in `GuessMap`.
+  Verify (mechanical): Unit tests — `matchName` accepts case/punctuation/partial variants and rejects wrong names; `guessByName` gives full points on a correct name (snapped to truth) and zero on a wrong one, and still resolves the AI. `npm.cmd test` passes; `npm.cmd run build` compiles.
+  Learner check: Type a correct name (e.g. "paris") and confirm full points; type a wrong name and confirm zero; confirm clicking the map still works; confirm the true marker pulses on the reveal.
+  Commit: `Add type-to-guess input and reveal-time truth pulse`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 1. Learner has no Google Maps API key yet, so live 3D-tile rendering is deferred to the final review; build verified via compile + clean dev-server boot, and the no-key fallback card confirmed. No look/camera change requested.
