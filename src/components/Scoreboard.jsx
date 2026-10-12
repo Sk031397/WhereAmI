@@ -1,11 +1,19 @@
 import { ROUNDS } from "../lib/gameState.js";
 
 // The bold scoreboard overlay — punchy result reveal in cinematic-luxury style.
+// Shows the player vs the simulated AI opponent.
 // Implements spec.md > Components > Scoreboard and
-// prd.md > Features and Behavior > See how close you were + Play five rounds.
-export default function Scoreboard({ phase, round, distanceKm, roundPoints, totalScore }) {
-  // Hidden on the final tally screen (FinalTally takes over).
-  if (phase === "finished") return null;
+// prd.md > Features and Behavior > Play five rounds against an AI.
+export default function Scoreboard({
+  phase,
+  round,
+  distanceKm,
+  roundPoints,
+  totalScore,
+  aiRoundPoints,
+  aiTotalScore,
+}) {
+  if (phase === "finished") return null; // FinalTally takes over
 
   const revealed = phase === "revealed" && distanceKm != null;
 
@@ -23,16 +31,24 @@ export default function Scoreboard({ phase, round, distanceKm, roundPoints, tota
       </div>
 
       {revealed && (
-        <>
-          <div className="scoreboard__points">
-            +{roundPoints.toLocaleString()} pts
+        <div className="scoreboard__reveal">
+          <div className="scoreboard__side">
+            <div className="scoreboard__side-label">You</div>
+            <div className="scoreboard__points">+{roundPoints.toLocaleString()}</div>
+            <div className="scoreboard__distance-sub">{distanceText} off</div>
           </div>
-          <div className="scoreboard__distance-sub">{distanceText} off</div>
-        </>
+          <div className="scoreboard__vs">vs</div>
+          <div className="scoreboard__side">
+            <div className="scoreboard__side-label">AI</div>
+            <div className="scoreboard__points scoreboard__points--ai">
+              +{(aiRoundPoints ?? 0).toLocaleString()}
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="scoreboard__total">
-        Total {totalScore.toLocaleString()}
+        You {totalScore.toLocaleString()} &nbsp;·&nbsp; AI {aiTotalScore.toLocaleString()}
       </div>
     </div>
   );

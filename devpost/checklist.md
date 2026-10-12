@@ -59,6 +59,16 @@ Build mode: fast
   Learner check: Play all 5 rounds; confirm points feel right (near guesses score high), the running total climbs, the round indicator counts up, and the tally + play-again work.
   Commit: `Add scoring, running total, and 5-round game with final tally`
 
+- [x] **6. Randomized round order and a simulated AI opponent**
+  Becomes usable: Each game shuffles the location order, and a simulated AI opponent guesses every round and scores by the same rules. The scoreboard shows You vs AI running totals, and the final tally declares a winner with play-again reshuffling.
+  Why now: Scope change — the player added randomized order and a head-to-head AI competitor (an honest scripted bot, NOT a vision model). Builds on the slice 5 scoring/round infrastructure.
+  PRD ref: `prd.md > Features and Behavior > Play five rounds against an AI, then see who won`, `prd.md > The Core Journey` (step 6), `prd.md > Product Decisions`
+  Spec ref: `spec.md > Components > App`, `spec.md > Components > Scoreboard`, `spec.md > Components > lib/distance.js`
+  Build: In `lib/gameState.js`, add a pure `shuffle(array, rng)` and build an `order` array of location indices at game start; track the round via an index into `order`. Add `aiGuessForAnswer(answer, errorKm, rng)` that offsets the true point by a randomized error (adjustable skill), scored with the same `scoreFromDistanceKm`. On `placeGuess`, also compute the AI's guess and points for the round and add to `aiTotalScore`. On `advance` past round 5, compute `winner` ("you" | "ai" | "tie"). `resetGame(rng)` reshuffles. Keep all functions pure by accepting an `rng` (default `Math.random`). Update `Scoreboard` to show both round points and both totals; update `FinalTally` to show You vs AI and the winner; wire `App`.
+  Verify (mechanical): Extend `gameState` tests — `shuffle` is a permutation (same elements), AI guess within plausible error produces a valid score, `aiTotalScore` accumulates, a deterministic rng yields a predictable winner, order is a permutation of all indices, reset reshuffles. `npm.cmd test` passes; `npm.cmd run build` compiles.
+  Learner check: Play a full game; confirm the order varies between games, the AI's score shows each round and in the tally, and the winner is declared correctly.
+  Commit: `Add randomized order and simulated AI opponent`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 1. Learner has no Google Maps API key yet, so live 3D-tile rendering is deferred to the final review; build verified via compile + clean dev-server boot, and the no-key fallback card confirmed. No look/camera change requested.

@@ -129,18 +129,48 @@ body {
   color: var(--muted);
 }
 
+.scoreboard__reveal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  margin: 0.3rem 0 0.2rem;
+}
+
+.scoreboard__side {
+  min-width: 92px;
+}
+
+.scoreboard__side-label {
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.6rem;
+  color: var(--muted);
+}
+
+.scoreboard__vs {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
 .scoreboard__points {
   font-family: var(--serif);
-  font-size: 3.1rem;
+  font-size: 2.2rem;
   line-height: 1.1;
   letter-spacing: 0.03em;
   color: var(--accent);
-  margin: 0.2rem 0 0.1rem;
+}
+
+.scoreboard__points--ai {
+  color: #9fc4d6;
 }
 
 .scoreboard__distance-sub {
   font-family: var(--sans);
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   letter-spacing: 0.08em;
   color: var(--offwhite);
 }
@@ -148,7 +178,7 @@ body {
 .scoreboard__total {
   font-family: var(--sans);
   text-transform: uppercase;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.2em;
   font-size: 0.68rem;
   color: var(--muted);
   margin-top: 0.5rem;
@@ -204,6 +234,36 @@ body {
   letter-spacing: 0.03em;
   color: var(--accent);
   margin: 0.4rem 0;
+}
+
+.tally__score--ai {
+  color: #9fc4d6;
+}
+
+.tally__headline {
+  font-family: var(--serif);
+  font-size: 2rem;
+  letter-spacing: 0.04em;
+  margin: 0.3rem 0 1.2rem;
+  color: var(--offwhite);
+}
+
+.tally__headline--you {
+  color: var(--accent);
+}
+
+.tally__headline--ai {
+  color: #9fc4d6;
+}
+
+.tally__scores {
+  display: flex;
+  gap: 2.4rem;
+  justify-content: center;
+}
+
+.tally__scoreside {
+  min-width: 110px;
 }
 
 .tally__button {

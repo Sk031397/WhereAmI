@@ -35,11 +35,14 @@ In scope — the minimum to prove the recognition kernel and the guess loop:
 - Drop-a-pin world map for guessing.
 - Score/feedback for a single guess: how close you were, as both a distance and points.
 - A fixed set of 5 rounds with a running score, then a final tally screen and play-again.
+- Randomized round order each game (shuffled from the hand-picked set).
+- A simulated AI opponent that guesses each round with an adjustable skill/error, scores by the same rules, and competes head-to-head for a win/lose outcome. (Honest scripted bot — NOT a vision model that "sees" the 3D scene.)
 
 ## Later
 - Larger / randomized pool of locations.
 - Difficulty levels (famous landmarks vs. obscure spots).
-- Multiplayer / head-to-head.
+- A real vision-model opponent that recognizes locations from the rendered 3D view.
+- Multiplayer / head-to-head against other people.
 - Leaderboards and sharing results.
 
 ## Explicitly Cut
