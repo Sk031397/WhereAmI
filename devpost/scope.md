@@ -40,6 +40,7 @@ In scope — the minimum to prove the recognition kernel and the guess loop:
 - Optional progressive hints: each location has two escalating clues; taking a hint reduces that round's score (multiplier), preserving the recognition challenge. The AI never uses hints.
 - Two ways to guess: click the corner map (distance-based), or type the place name (correct fuzzy match = full points as if pinned on the truth, wrong = zero that round). The minimap remains.
 - A reveal-time pulsing glow on the true-location marker (shown only after the guess locks).
+- A start screen before round 1 that frames the game (the task and how to guess) without revealing any location — protecting the recognition kernel.
 
 ## Later
 - Larger / randomized pool of locations.

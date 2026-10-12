@@ -11,7 +11,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`.
 ## The Core Journey
 Develops `scope.md > The Core Loop` and `scope.md > What "Working" Looks Like`.
 
-1. The player opens the game and drops straight into a photorealistic 3D location with no label. The 3D view fills the screen; a small world-map panel sits in a corner.
+1. The player opens the game and sees a brief **start screen** that frames the task — you'll be dropped into real places in 3D and must recognize where you are, guessing by map pin or by typing the name, racing an AI across 5 rounds. It names no location. Pressing **Start** drops them into the first photorealistic 3D location with no label; the 3D view fills the screen; a small world-map panel sits in a corner.
 2. The player flies and looks around the 3D scene, reading landmarks and layout for clues to where they are.
 3. When they recognize (or reason out) the place, they click the corner map to drop a pin. The pin locks instantly — one guess per round, no confirm step and no undo.
 4. The result reveals: a distance number showing how far the guess was from the real location, and the true location shown on the map alongside the player's pin.

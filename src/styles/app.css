@@ -321,6 +321,83 @@ body {
   }
 }
 
+/* Intro / start screen — full-screen framing before round 1. */
+.start {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 21, 18, 0.82);
+  backdrop-filter: blur(8px);
+  z-index: 900;
+  animation: tally-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.start__card {
+  max-width: 520px;
+  padding: 2.8rem 3rem;
+  background: var(--charcoal);
+  border-radius: 20px;
+  box-shadow: var(--panel-shadow);
+  border: 1px solid rgba(232, 200, 154, 0.22);
+  text-align: center;
+}
+
+.start__title {
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  font-size: 2.6rem;
+  margin: 0 0 0.4rem;
+  color: var(--accent);
+}
+
+.start__tagline {
+  font-family: var(--sans);
+  color: var(--offwhite);
+  letter-spacing: 0.02em;
+  margin: 0 0 1.6rem;
+}
+
+.start__points {
+  text-align: left;
+  margin: 0 auto 1.8rem;
+  padding-left: 1.2rem;
+  max-width: 420px;
+}
+
+.start__points li {
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0.55rem 0;
+}
+
+.start__points strong {
+  color: var(--offwhite);
+}
+
+.start__button {
+  padding: 0.9rem 3rem;
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.82rem;
+  color: var(--espresso);
+  background: var(--accent);
+  border: none;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.start__button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
 /* Floating hint panel — top-left, shown while exploring. */
 .hints {
   position: absolute;

@@ -5,6 +5,7 @@ import Scoreboard from "./components/Scoreboard.jsx";
 import FinalTally from "./components/FinalTally.jsx";
 import HintPanel from "./components/HintPanel.jsx";
 import TypeGuess from "./components/TypeGuess.jsx";
+import StartScreen from "./components/StartScreen.jsx";
 import { locations } from "./data/locations.js";
 import {
   initialState,
@@ -25,6 +26,8 @@ const REVEAL_LINGER_MS = 5000;
 export default function App() {
   // Seed the shuffled order once per game using the default Math.random.
   const [state, setState] = useState(() => initialState(undefined, locations.length));
+  // Intro/start screen gate (pure UI state — the game reducer is unchanged).
+  const [started, setStarted] = useState(false);
 
   const current = locations[currentLocationIndex(state)];
   const locked = isLocked(state);
@@ -59,35 +62,38 @@ export default function App() {
   return (
     <div className="app">
       <World3D camera={current.camera} />
-      {state.phase === "exploring" && (
+      {started && state.phase === "exploring" && (
         <HintPanel
           hints={current.hints}
           hintsUsed={state.hintsUsed}
           onHint={handleHint}
         />
       )}
-      {state.phase === "exploring" && <TypeGuess onSubmit={handleTypeGuess} />}
-      <Scoreboard
-        phase={state.phase}
-        round={roundNumber(state)}
-        locationName={current.name}
-        distanceKm={state.distanceKm}
-        typedGuess={state.typedGuess}
-        typedCorrect={state.typedCorrect}
-        roundPoints={state.roundPoints}
-        totalScore={state.totalScore}
-        aiRoundPoints={state.aiRoundPoints}
-        aiTotalScore={state.aiTotalScore}
-      />
+      {started && state.phase === "exploring" && <TypeGuess onSubmit={handleTypeGuess} />}
+      {started && (
+        <Scoreboard
+          phase={state.phase}
+          round={roundNumber(state)}
+          locationName={current.name}
+          distanceKm={state.distanceKm}
+          typedGuess={state.typedGuess}
+          typedCorrect={state.typedCorrect}
+          roundPoints={state.roundPoints}
+          totalScore={state.totalScore}
+          aiRoundPoints={state.aiRoundPoints}
+          aiTotalScore={state.aiTotalScore}
+        />
+      )}
       <GuessMap
         guess={state.guess}
         aiGuess={state.phase === "revealed" ? state.aiGuess : null}
         truth={truth}
         roundPoints={state.roundPoints}
         aiRoundPoints={state.aiRoundPoints}
-        locked={locked}
+        locked={locked || !started}
         onPick={handlePick}
       />
+      {!started && <StartScreen onStart={() => setStarted(true)} />}
       {state.phase === "finished" && (
         <FinalTally
           totalScore={state.totalScore}
