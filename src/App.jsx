@@ -72,6 +72,8 @@ export default function App() {
         round={roundNumber(state)}
         locationName={current.name}
         distanceKm={state.distanceKm}
+        typedGuess={state.typedGuess}
+        typedCorrect={state.typedCorrect}
         roundPoints={state.roundPoints}
         totalScore={state.totalScore}
         aiRoundPoints={state.aiRoundPoints}

@@ -246,6 +246,18 @@ describe("type-to-guess (slice 9)", () => {
     expect(s.aiRoundPoints).toBeGreaterThanOrEqual(0);
   });
 
+  it("records the typed text and correctness so the reveal can echo it", () => {
+    const wrong = guessByName(initialState(seededRng(1), named.length), "atlantis", named, seededRng(2));
+    expect(wrong.phase).toBe("revealed"); // reveal fires even with no distance
+    expect(wrong.typedGuess).toBe("atlantis");
+    expect(wrong.typedCorrect).toBe(false);
+    expect(wrong.distanceKm).toBeNull();
+
+    const s0 = initialState(seededRng(1), named.length);
+    const right = guessByName(s0, named[s0.order[0]].name, named, seededRng(2));
+    expect(right.typedCorrect).toBe(true);
+  });
+
   it("applies the hint penalty to a correct typed guess", () => {
     let s = initialState(seededRng(1), named.length);
     s = takeHint(takeHint(s)); // two hints → ×0.3

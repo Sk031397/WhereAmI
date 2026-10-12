@@ -238,6 +238,24 @@ body {
   margin: 0.1rem 0 0.4rem;
 }
 
+.scoreboard__prompt {
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  max-width: 360px;
+  margin: 0.3rem auto 0;
+  line-height: 1.5;
+}
+
+.scoreboard__typed {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  color: var(--offwhite);
+  margin-bottom: 0.4rem;
+}
+
 .scoreboard__answer strong {
   color: var(--accent);
   font-weight: 600;
