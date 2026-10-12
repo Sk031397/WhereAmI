@@ -50,6 +50,7 @@ export default function App() {
       <Scoreboard
         phase={state.phase}
         round={roundNumber(state)}
+        locationName={current.name}
         distanceKm={state.distanceKm}
         roundPoints={state.roundPoints}
         totalScore={state.totalScore}

@@ -165,6 +165,19 @@ body {
   margin: 0.3rem 0 0.2rem;
 }
 
+.scoreboard__answer {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  letter-spacing: 0.03em;
+  color: var(--offwhite);
+  margin: 0.1rem 0 0.4rem;
+}
+
+.scoreboard__answer strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .scoreboard__side {
   min-width: 92px;
 }

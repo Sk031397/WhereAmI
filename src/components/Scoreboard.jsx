@@ -8,6 +8,7 @@ import PlayerOrb from "./PlayerOrb.jsx";
 export default function Scoreboard({
   phase,
   round,
+  locationName,
   distanceKm,
   roundPoints,
   totalScore,
@@ -32,7 +33,11 @@ export default function Scoreboard({
       </div>
 
       {revealed && (
-        <div className="scoreboard__reveal">
+        <>
+          <div className="scoreboard__answer">
+            That was <strong>{locationName}</strong>
+          </div>
+          <div className="scoreboard__reveal">
             <div className="scoreboard__side">
               <PlayerOrb name="You" variant="gold" size="sm" />
               <div className="scoreboard__points">+{roundPoints.toLocaleString()}</div>
@@ -46,6 +51,7 @@ export default function Scoreboard({
               </div>
             </div>
           </div>
+        </>
       )}
 
       <div className="scoreboard__total">
