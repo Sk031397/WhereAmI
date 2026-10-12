@@ -35,6 +35,11 @@ export default function World3D({ camera }) {
           // SATELLITE = photorealistic imagery with no labels — labels would
           // give away the location, so SATELLITE fits the guessing game.
           mode: satelliteMode,
+          // Disable Google's built-in controls (incl. click/double-click
+          // "fly to this point" navigation) so clicking the 3D view doesn't
+          // teleport the camera — the player should fly manually and guess
+          // on the corner map, not click to jump around.
+          defaultUIDisabled: true,
         };
         // A vector Map ID is required for 3D maps in current API versions.
         if (mapId) options.mapId = mapId;
