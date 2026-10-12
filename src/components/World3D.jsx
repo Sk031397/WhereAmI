@@ -18,19 +18,28 @@ export default function World3D({ camera }) {
         const { Map3DElement } = await window.google.maps.importLibrary("maps3d");
         if (cancelled || !containerRef.current) return;
 
-        const map3d = new Map3DElement({
+        const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+        const options = {
           center: camera.center,
           range: camera.range,
           tilt: camera.tilt,
           heading: camera.heading,
-        });
+        };
+        // A vector Map ID is required for 3D maps in current API versions.
+        if (mapId) options.mapId = mapId;
+
+        const map3d = new Map3DElement(options);
         map3d.style.width = "100%";
         map3d.style.height = "100%";
         containerRef.current.appendChild(map3d);
         mapRef.current = map3d;
       })
       .catch((err) => {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) {
+          // Surface the real reason in the console for diagnosis.
+          console.error("World3D failed to load:", err);
+          setError(err.message);
+        }
       });
 
     return () => {
