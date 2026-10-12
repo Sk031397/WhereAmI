@@ -72,4 +72,6 @@ Activity mode: focused alternative (evidence-based), app map generated from comm
 
 ## Revisions
 
+- Set a required `mode` on `Map3DElement` (`Map3DMode.SATELLITE`) in `src/components/World3D.jsx` — the build discovered the live Google 3D Maps API (v3.60.1+, post Feb 2025) rejects a 3D map with no `mode`, producing "Attempted to load a 3D Map, but failed." SATELLITE gives label-free photorealistic imagery, which also fits the game (labels would reveal the location). Also added optional Map ID support and scoped Vitest to `tests/` so a stray `.trunk` plugin cache stopped polluting the test run. Internal corrections; the kernel and all learner product decisions are unchanged.
+
 - Extracted game-state transitions into a pure `src/lib/gameState.js` reducer (and created `src/lib/distance.js` during slice 2 instead of slice 3) — the build showed the lock/score/advance logic is far more reliably verifiable as pure functions than through simulated Leaflet DOM clicks in jsdom. Internal design choice; preserves all learner product decisions. `distance.js` is still exercised by its own unit test in slice 3 as planned.

@@ -15,7 +15,7 @@ export default function World3D({ camera }) {
 
     loadGoogleMaps()
       .then(async () => {
-        const { Map3DElement } = await window.google.maps.importLibrary("maps3d");
+        const { Map3DElement, Map3DMode } = await window.google.maps.importLibrary("maps3d");
         if (cancelled || !containerRef.current) return;
 
         const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
@@ -24,6 +24,10 @@ export default function World3D({ camera }) {
           range: camera.range,
           tilt: camera.tilt,
           heading: camera.heading,
+          // `mode` is required to render the 3D map (API v3.60.1+).
+          // SATELLITE = photorealistic imagery with no labels — labels would
+          // give away the location, so SATELLITE fits the guessing game.
+          mode: Map3DMode.SATELLITE,
         };
         // A vector Map ID is required for 3D maps in current API versions.
         if (mapId) options.mapId = mapId;
