@@ -33,12 +33,11 @@ In scope — the minimum to prove the recognition kernel and the guess loop:
 - Load a real, photorealistic 3D location the player can look around / fly in.
 - A small hand-picked set of recognizable locations (enough to demo a round or two).
 - Drop-a-pin world map for guessing.
-- Score/feedback for a single guess: how close you were.
-- One round → result → next place.
+- Score/feedback for a single guess: how close you were, as both a distance and points.
+- A fixed set of 5 rounds with a running score, then a final tally screen and play-again.
 
 ## Later
 - Larger / randomized pool of locations.
-- Multiple rounds with a running score and a final tally.
 - Difficulty levels (famous landmarks vs. obscure spots).
 - Multiplayer / head-to-head.
 - Leaderboards and sharing results.

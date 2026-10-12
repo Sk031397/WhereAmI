@@ -121,21 +121,39 @@ body {
   animation: scoreboard-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.scoreboard__label {
+.scoreboard__round {
   font-family: var(--sans);
   text-transform: uppercase;
   letter-spacing: 0.42em;
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   color: var(--muted);
 }
 
-.scoreboard__distance {
+.scoreboard__points {
   font-family: var(--serif);
   font-size: 3.1rem;
   line-height: 1.1;
   letter-spacing: 0.03em;
   color: var(--accent);
-  margin: 0.15rem 0;
+  margin: 0.2rem 0 0.1rem;
+}
+
+.scoreboard__distance-sub {
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: var(--offwhite);
+}
+
+.scoreboard__total {
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(232, 200, 154, 0.18);
+  padding-top: 0.5rem;
 }
 
 @keyframes scoreboard-in {
@@ -146,5 +164,73 @@ body {
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* Final tally screen — a centered cinematic card over a dimmed world. */
+.tally {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 21, 18, 0.78);
+  backdrop-filter: blur(8px);
+  z-index: 800;
+  animation: tally-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.tally__card {
+  text-align: center;
+  padding: 2.8rem 3.4rem;
+  background: var(--charcoal);
+  border-radius: 20px;
+  box-shadow: var(--panel-shadow);
+  border: 1px solid rgba(232, 200, 154, 0.22);
+}
+
+.tally__label {
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.tally__score {
+  font-family: var(--serif);
+  font-size: 4.4rem;
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  margin: 0.4rem 0;
+}
+
+.tally__button {
+  margin-top: 1.6rem;
+  padding: 0.8rem 2rem;
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.78rem;
+  color: var(--espresso);
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.tally__button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+@keyframes tally-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

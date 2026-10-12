@@ -49,6 +49,16 @@ Build mode: fast
   Learner check: Make a guess, confirm you can still fly during the ~5s reveal, watch it move to the next place, and play through to confirm it loops back around.
   Commit: `Add result linger, auto-advance, and loop`
 
+- [x] **5. Scoring, running total, and a fixed 5-round game with a final tally**
+  Becomes usable: Each guess earns points (closer = more), a running total shows on the scoreboard with a "Round N of 5" indicator, and after round 5 a final tally screen shows the total with a play-again button that resets to round 1.
+  Why now: Scope change — the player pulled running score + fixed rounds + tally from `scope.md > Later` into the POC to make the working loop feel like a game. Builds directly on the slice 1-4 loop.
+  PRD ref: `prd.md > Features and Behavior > See how close you were`, `prd.md > Features and Behavior > Play five rounds, then see a final tally`, `prd.md > The Core Journey` (steps 5-6)
+  Spec ref: `spec.md > Components > App`, `spec.md > Components > Scoreboard`, `spec.md > Components > lib/distance.js`
+  Build: Add a pure `scoreFromDistanceKm` in `lib/gameState.js` (max points for near-zero, decaying with distance). Extend state with `totalScore`, `round`, and a `finished` phase; `placeGuess` adds round points to the total; `advance` increments the round and switches to `finished` after round 5 instead of wrapping. Update `Scoreboard` to show points earned + running total + "Round N of 5". Add a `FinalTally` component (total score + play-again). Wire `App` to render the tally when finished and reset on play-again.
+  Verify (mechanical): Extend `gameState` unit tests — points decay with distance, running total accumulates across rounds, `finished` triggers after round 5 (not a wraparound), play-again resets total/round. `npm.cmd test` passes; `npm.cmd run build` compiles.
+  Learner check: Play all 5 rounds; confirm points feel right (near guesses score high), the running total climbs, the round indicator counts up, and the tally + play-again work.
+  Commit: `Add scoring, running total, and 5-round game with final tally`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 1. Learner has no Google Maps API key yet, so live 3D-tile rendering is deferred to the final review; build verified via compile + clean dev-server boot, and the no-key fallback card confirmed. No look/camera change requested.
