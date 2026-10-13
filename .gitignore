@@ -12,6 +12,12 @@ Thumbs.db
 # Personal learning context — kept out of commits by default
 devpost/learner-profile.md
 
+# Devpost Learn skill harness (workflow tooling, not the project)
+agent/
+.agents/
+.claude/
+skills-lock.json
+
 # Environment secrets
 .env
 .env.*

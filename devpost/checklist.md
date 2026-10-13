@@ -106,7 +106,7 @@ Build mode: fast
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [x] Final review complete — feedback resolved and learner confirms ready to ship. Learner confirmed "It's ready" after a full playthrough (recognizability camera retune + click-navigation fix verified in browser). Mechanical: 35/35 tests pass, clean dev-server boot.
 
 ## Code Tour and App Map
 
