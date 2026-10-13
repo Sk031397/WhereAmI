@@ -54,6 +54,10 @@ Implements the submission needs for `6-ship`.
 - **Demo:** record the browser locally — drop into a place, fly, drop a pin, show the distance + true-location reveal, let it auto-advance. Submission requires a short demo video **and** a public GitHub repo.
 - **Deployment:** optional, deferred to `6-ship`. Keeping it local for now; the video is sufficient for submission. (If later deployed, note the API key must be domain-restricted.)
 
+### Submission links
+- **Public GitHub repository:** https://github.com/Sk031397/WhereAmI
+- **Demo video:** https://vimeo.com/1235577239
+
 ## Look and Feel
 Carried from `prd.md > Look and Feel` and `scope.md > Inspiration & Identity`. Direction, not a full design system.
 
